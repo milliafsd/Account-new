@@ -5,14 +5,14 @@ import re
 import struct
 from pathlib import Path
 from datetime import datetime
-from io import BytesIO, StringIO
-import csv
+from io import BytesIO
 import secrets
-import time
 import base64
 import pandas as pd
 
-# ---------------- Database Setup ------------------
+# ─────────────────────────────────────────────
+#  Database Setup
+# ─────────────────────────────────────────────
 DB_PATH = Path(__file__).parent / "madrasa_modern.sqlite3"
 
 def get_connection():
@@ -75,275 +75,367 @@ def init_db():
         CREATE INDEX IF NOT EXISTS idx_entries_year_date ON entries(year, entry_date);
         CREATE INDEX IF NOT EXISTS idx_entries_year_code ON entries(year, code);
     """)
-    seed_default_user(conn)
+    _seed_default_user(conn)
     conn.commit()
     conn.close()
 
-def seed_default_user(conn):
+def _seed_default_user(conn):
     exists = conn.execute("SELECT username FROM app_users WHERE username = 'admin'").fetchone()
     if not exists:
-        hashed = bcrypt.hashpw("admin123".encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-        conn.execute("INSERT INTO app_users (username, password_hash, display_name) VALUES (?, ?, ?)",
-                     ("admin", hashed, "Administrator"))
+        hashed = bcrypt.hashpw(b"admin123", bcrypt.gensalt()).decode()
+        conn.execute(
+            "INSERT INTO app_users (username, password_hash, display_name) VALUES (?, ?, ?)",
+            ("admin", hashed, "Administrator"),
+        )
 
-# ---------------- Custom CSS for Colorful Design ----------------
-def local_css():
+# ─────────────────────────────────────────────
+#  CSS
+# ─────────────────────────────────────────────
+def inject_css():
     st.markdown("""
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-        html, body, [class*="css"]  {
-            font-family: 'Inter', sans-serif;
-        }
-        .main-header {
-            background: linear-gradient(135deg, #0e695c 0%, #1db89a 100%);
-            padding: 2rem 1rem;
-            border-radius: 16px;
-            color: white;
-            margin-bottom: 2rem;
-            text-align: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        }
-        .main-header h1 {
-            font-weight: 700;
-            font-size: 2.2rem;
-            margin: 0;
-        }
-        .card {
-            background: white;
-            border-radius: 16px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            margin-bottom: 1rem;
-            border: 1px solid #eef2f7;
-        }
-        .metric-card {
-            background: white;
-            border-radius: 12px;
-            padding: 1rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-            text-align: center;
-            border-top: 4px solid #0e695c;
-        }
-        .metric-card.income {
-            border-top-color: #0e695c;
-            background: linear-gradient(to bottom, #f0fdf8, white);
-        }
-        .metric-card.expense {
-            border-top-color: #b56a20;
-            background: linear-gradient(to bottom, #fef8f0, white);
-        }
-        .metric-card.balance {
-            border-top-color: #2790b0;
-            background: linear-gradient(to bottom, #f0f8fc, white);
-        }
-        .stButton > button {
-            border-radius: 10px;
-            font-weight: 600;
-            transition: all 0.2s;
-            background-image: linear-gradient(to bottom, #0e695c, #0a5548);
-            color: white;
-            border: none;
-        }
-        .stButton > button:hover {
-            background-image: linear-gradient(to bottom, #1db89a, #0e695c);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 15px rgba(14,105,92,0.4);
-        }
-        .sidebar .stButton > button {
-            background: #f0f4f9;
-            color: #162033;
-            border: 1px solid #dce3eb;
-            font-weight: 500;
-        }
-        .sidebar .stButton > button:hover {
-            background: #e0e7f0;
-            color: #0e695c;
-        }
-        .dataframe table {
-            border-collapse: collapse;
-            width: 100%;
-            font-size: 14px;
-        }
-        .dataframe th {
-            background-color: #eef3fb !important;
-            color: #162033 !important;
-            font-weight: 600;
-        }
-        .dataframe tr:nth-child(even) {
-            background-color: #fbfcfe;
-        }
-        .dataframe td, .dataframe th {
-            padding: 10px 8px !important;
-            border-bottom: 1px solid #eef0f5;
-        }
-        /* RTL Support */
-        body.rtl {
-            direction: rtl;
-            text-align: right;
-        }
-        body.rtl .stRadio > div {
-            flex-direction: row-reverse;
-        }
-    </style>
-    """, unsafe_allow_html=True)
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Noto+Nastaliq+Urdu:wght@400;700&display=swap');
 
-# ---------------- Colorful Header ----------------
-def colored_header(title, subtitle=None):
-    st.markdown(f"""
-    <div class="main-header">
-        <h1>{title}</h1>
-        <p style="font-size: 1.1rem; opacity: 0.9; margin-top: 0.5rem;">{subtitle or ''}</p>
-    </div>
-    """, unsafe_allow_html=True)
+html, body, [class*="css"] {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
 
-# ---------------- Multilingual Support ----------------
+/* ── Sidebar ─────────────────────────────── */
+[data-testid="stSidebar"] {
+    background: #0b3d2e !important;
+}
+[data-testid="stSidebar"] * {
+    color: #d4f0e4 !important;
+}
+[data-testid="stSidebar"] .stSelectbox label,
+[data-testid="stSidebar"] .stRadio label,
+[data-testid="stSidebar"] .stFileUploader label {
+    color: #8ecfb0 !important;
+    font-size: 0.78rem !important;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+[data-testid="stSidebar"] [data-testid="stSelectbox"] > div > div {
+    background: #0f4f39 !important;
+    border: 1px solid #1a6e4e !important;
+    color: #d4f0e4 !important;
+    border-radius: 8px !important;
+}
+[data-testid="stSidebar"] .stButton > button {
+    background: transparent !important;
+    border: 1px solid rgba(255,255,255,0.15) !important;
+    color: #d4f0e4 !important;
+    border-radius: 10px !important;
+    font-size: 0.85rem !important;
+    padding: 0.5rem 0.8rem !important;
+    text-align: left !important;
+    width: 100% !important;
+    transition: all 0.2s !important;
+}
+[data-testid="stSidebar"] .stButton > button:hover {
+    background: rgba(255,255,255,0.1) !important;
+    border-color: rgba(255,255,255,0.3) !important;
+    transform: translateX(3px) !important;
+}
+[data-testid="stSidebar"] hr {
+    border-color: rgba(255,255,255,0.1) !important;
+}
+
+/* ── Main area ───────────────────────────── */
+.main .block-container {
+    padding-top: 1.5rem !important;
+    max-width: 1200px;
+}
+
+/* ── Page header ─────────────────────────── */
+.page-header {
+    background: linear-gradient(135deg, #0b3d2e 0%, #1a7a52 50%, #22c97a 100%);
+    padding: 1.6rem 2rem;
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+.page-header::after {
+    content: '';
+    position: absolute;
+    right: -40px; top: -40px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+}
+.page-header h1 {
+    color: #fff !important;
+    font-size: 1.7rem !important;
+    font-weight: 700 !important;
+    margin: 0 !important;
+}
+.page-header p {
+    color: rgba(255,255,255,0.75) !important;
+    margin: 4px 0 0 !important;
+    font-size: 0.9rem !important;
+}
+
+/* ── KPI cards ───────────────────────────── */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 1.5rem;
+}
+.kpi-card {
+    border-radius: 14px;
+    padding: 1.2rem 1.4rem;
+    position: relative;
+    overflow: hidden;
+}
+.kpi-card.green  { background: linear-gradient(135deg,#e6faf2,#c7f3df); border-left: 4px solid #1db87a; }
+.kpi-card.orange { background: linear-gradient(135deg,#fff4e5,#ffe8c5); border-left: 4px solid #e07b20; }
+.kpi-card.blue   { background: linear-gradient(135deg,#e8f4ff,#c8e4fd); border-left: 4px solid #2176ae; }
+.kpi-card .kpi-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: #5a7068; font-weight: 600; }
+.kpi-card .kpi-value { font-size: 1.7rem; font-weight: 700; margin: 4px 0 0; }
+.kpi-card.green  .kpi-value { color: #0b5c36; }
+.kpi-card.orange .kpi-value { color: #7a3d00; }
+.kpi-card.blue   .kpi-value { color: #0c3a6e; }
+.kpi-card .kpi-sub { font-size: 0.75rem; color: #6b8072; margin-top: 2px; }
+
+/* ── Form card ───────────────────────────── */
+.form-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid #e6ede9;
+    box-shadow: 0 2px 12px rgba(11,61,46,0.06);
+}
+.form-card h3 {
+    color: #0b3d2e;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 1rem 0;
+    padding-bottom: 0.6rem;
+    border-bottom: 2px solid #e6faf2;
+}
+
+/* ── Data table ──────────────────────────── */
+[data-testid="stDataFrame"] table {
+    border-collapse: collapse !important;
+    font-size: 13px !important;
+}
+[data-testid="stDataFrame"] th {
+    background: #e8f5f0 !important;
+    color: #0b3d2e !important;
+    font-weight: 600 !important;
+    font-size: 12px !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 10px 12px !important;
+}
+[data-testid="stDataFrame"] td {
+    padding: 9px 12px !important;
+    border-bottom: 1px solid #f0f4f2 !important;
+    color: #1a2e24 !important;
+}
+[data-testid="stDataFrame"] tr:hover td {
+    background: #f0faf5 !important;
+}
+
+/* ── Inputs ──────────────────────────────── */
+.stTextInput > div > div > input,
+.stNumberInput > div > div > input,
+.stTextArea > div > textarea,
+.stSelectbox > div > div {
+    border-radius: 10px !important;
+    border: 1.5px solid #d0e4d8 !important;
+    transition: border 0.2s !important;
+}
+.stTextInput > div > div > input:focus,
+.stNumberInput > div > div > input:focus,
+.stTextArea > div > textarea:focus {
+    border-color: #1db87a !important;
+    box-shadow: 0 0 0 3px rgba(29,184,122,0.12) !important;
+}
+
+/* ── Primary button ──────────────────────── */
+.main .stButton > button[kind="primary"],
+.main .stFormSubmitButton > button {
+    background: linear-gradient(135deg, #0b3d2e, #1a7a52) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+    padding: 0.5rem 1.4rem !important;
+    transition: all 0.2s !important;
+    box-shadow: 0 4px 12px rgba(11,61,46,0.25) !important;
+}
+.main .stButton > button[kind="primary"]:hover,
+.main .stFormSubmitButton > button:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 18px rgba(11,61,46,0.35) !important;
+}
+
+/* ── Badge / info boxes ──────────────────── */
+.head-found {
+    background: #e6faf2;
+    border: 1px solid #a8e6c8;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    color: #0b5c36;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+.head-missing {
+    background: #fff2f0;
+    border: 1px solid #f5c0b8;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    color: #9a2e1a;
+    margin-bottom: 6px;
+}
+
+/* ── Section divider ─────────────────────── */
+.section-title {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #5a8070;
+    font-weight: 700;
+    margin: 1.2rem 0 0.6rem;
+}
+
+/* ── Login ───────────────────────────────── */
+.login-wrap {
+    max-width: 400px;
+    margin: 5vh auto 0;
+}
+.login-logo {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+.login-logo h1 {
+    font-size: 1.8rem;
+    color: #0b3d2e;
+    font-weight: 700;
+    margin: 0;
+}
+.login-logo .urdu-title {
+    font-family: 'Noto Nastaliq Urdu', serif;
+    font-size: 1.2rem;
+    color: #1a7a52;
+    direction: rtl;
+    margin-top: 4px;
+}
+.login-logo .sub {
+    color: #6b8072;
+    font-size: 0.85rem;
+    margin-top: 4px;
+}
+.login-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 8px 40px rgba(11,61,46,0.12);
+    border: 1px solid #e0ede6;
+}
+
+/* ── Nav active state (via JS class trick) ── */
+.nav-active button {
+    background: rgba(34,201,122,0.15) !important;
+    border-color: #22c97a !important;
+    color: #22c97a !important;
+}
+
+/* ── Scrollbar ───────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #f0f4f2; }
+::-webkit-scrollbar-thumb { background: #9ecfb5; border-radius: 3px; }
+</style>
+""", unsafe_allow_html=True)
+
+# ─────────────────────────────────────────────
+#  i18n
+# ─────────────────────────────────────────────
+BRAND_NAME = "JAMIA MILLIA ISLAMIA AND MASJID MADRASA WALI"
+BRAND_URDU = "جامعہ ملیہ اسلامیہ و مسجد مدرسہ ولی"
+
 I18N = {
     "en": {
         "login_title": "Madrasa Accounting",
-        "username": "Username",
-        "password": "Password",
-        "login_btn": "🔐 Login",
-        "logout": "🚪 Logout",
-        "tab_income": "💰 Income Entry",
-        "tab_expense": "💸 Expense Entry",
-        "tab_reports": "📊 Reports",
-        "tab_ledger": "📒 Ledger",
-        "tab_accounts": "🗂 Accounts",
-        "tab_overview": "📈 Overview",
-        "tab_settings": "⚙ Settings",
-        "year": "📅 Working Year",
-        "language": "🌐 Language",
-        "reload_year": "🔄 Reload Year",
-        "upload_legacy": "📁 Upload Old Data",
-        "import_year": "📥 Import Current Year",
-        "upload_files": "📤 Upload Files",
-        "save_income": "💾 Save Income",
-        "save_expense": "💾 Save Expense",
-        "reset": "🔄 Reset",
-        "date": "📆 Date",
-        "code": "🔢 Code",
-        "account_head": "🏦 Account Head",
-        "branch": "🏢 Branch",
-        "category": "🏷 Category",
-        "receipt_no": "🧾 Receipt No",
-        "voucher_no": "🎫 Voucher No",
-        "jv_no": "📝 JV No",
-        "description": "📄 Description",
-        "amount": "💵 Amount",
-        "save_account_head": "💾 Save Account Head",
-        "total_entries": "📋 Total Entries",
-        "total_income": "💰 Total Income",
-        "total_expense": "💸 Total Expense",
-        "net_balance": "⚖ Net Balance",
-        "opening_balance": "🔓 Opening Balance",
-        "cash_in_hand": "💵 Cash In Hand",
-        "edit": "✏ Edit",
-        "delete": "🗑 Delete",
-        "actions": "⚡ Actions",
-        "report_type": "📑 Report Type",
-        "from_date": "📅 From Date",
-        "to_date": "📅 To Date",
-        "view_report": "👁 View Report",
-        "download_csv": "📥 Download CSV",
-        "download_pdf": "📥 Download PDF",
-        "print": "🖨 Print",
-        "monthly_flow": "📊 Monthly Flow",
-        "top_accounts": "🏆 Top Accounts",
-        "settings_title": "⚙ Year Settings",
-        "save_settings": "💾 Save Settings",
-        "entry_type": "🔖 Entry Type",
-        "search": "🔍 Search",
-        "refresh_ledger": "🔄 Refresh Ledger",
-        "code_hint": "Type the code, account head will appear automatically.",
-        "account_not_found": "❌ Head not found",
-        "no_data": "ℹ No data found",
-        "select_year": "Select Year",
-        "create_year": "Create Year",
+        "username": "Username", "password": "Password",
+        "login_btn": "Login", "logout": "Logout",
+        "tab_income": "Income Entry", "tab_expense": "Expense Entry",
+        "tab_reports": "Reports", "tab_ledger": "Ledger",
+        "tab_accounts": "Accounts", "tab_overview": "Overview",
+        "tab_settings": "Settings", "year": "Working Year",
+        "language": "Language",
+        "save_income": "Save Income", "save_expense": "Save Expense",
+        "date": "Date", "code": "Account Code", "account_head": "Account Head",
+        "branch": "Branch", "category": "Category",
+        "receipt_no": "Receipt No", "voucher_no": "Voucher No",
+        "jv_no": "JV No", "description": "Description", "amount": "Amount (Rs.)",
+        "save_account_head": "Save Account",
+        "total_entries": "Total Entries", "total_income": "Total Income",
+        "total_expense": "Total Expense", "net_balance": "Net Balance",
+        "cash_in_hand": "Cash In Hand",
+        "report_type": "Report Type", "from_date": "From Date", "to_date": "To Date",
+        "view_report": "View Report", "download_csv": "Download CSV",
+        "monthly_flow": "Monthly Cash Flow", "top_accounts": "Top Accounts",
+        "settings_title": "Year Settings", "save_settings": "Save Settings",
+        "entry_type": "Entry Type", "search": "Search",
+        "refresh_ledger": "Refresh", "account_not_found": "Account not found",
+        "no_data": "No data found", "select_year": "Select Year",
+        "create_year": "Create Year", "upload_legacy": "Import Old Data",
+        "upload_files": "Upload & Import",
+        "new_income": "New Income Entry", "new_expense": "New Expense Entry",
+        "recent_income": "Recent Income", "recent_expenses": "Recent Expenses",
     },
     "ur": {
         "login_title": "مدرسہ اکاؤنٹنگ",
-        "username": "یوزر نیم",
-        "password": "پاس ورڈ",
-        "login_btn": "🔐 لاگ ان",
-        "logout": "🚪 لاگ آؤٹ",
-        "tab_income": "💰 انکم انٹری",
-        "tab_expense": "💸 پیمنٹس انٹری",
-        "tab_reports": "📊 رپورٹس",
-        "tab_ledger": "📒 لیجر",
-        "tab_accounts": "🗂 اکاؤنٹس",
-        "tab_overview": "📈 جائزہ",
-        "tab_settings": "⚙ سیٹنگز",
-        "year": "📅 کام کا سال",
-        "language": "🌐 زبان",
-        "reload_year": "🔄 سال دوبارہ لوڈ",
-        "upload_legacy": "📁 پرانا ڈیٹا اپلوڈ",
-        "import_year": "📥 موجودہ سال امپورٹ",
-        "upload_files": "📤 فائلیں اپلوڈ کریں",
-        "save_income": "💾 انکم محفوظ کریں",
-        "save_expense": "💾 پیمنٹ محفوظ کریں",
-        "reset": "🔄 ری سیٹ",
-        "date": "📆 تاریخ",
-        "code": "🔢 کوڈ",
-        "account_head": "🏦 اکاؤنٹ ہیڈ",
-        "branch": "🏢 برانچ",
-        "category": "🏷 کیٹیگری",
-        "receipt_no": "🧾 رسید نمبر",
-        "voucher_no": "🎫 واؤچر نمبر",
-        "jv_no": "📝 جے وی نمبر",
-        "description": "📄 تفصیل",
-        "amount": "💵 رقم",
-        "save_account_head": "💾 اکاؤنٹ ہیڈ محفوظ",
-        "total_entries": "📋 کل انٹریز",
-        "total_income": "💰 کل انکم",
-        "total_expense": "💸 کل پیمنٹ",
-        "net_balance": "⚖ خالص بیلنس",
-        "opening_balance": "🔓 اوپننگ بیلنس",
-        "cash_in_hand": "💵 کیش ان ہینڈ",
-        "edit": "✏ ترمیم",
-        "delete": "🗑 حذف",
-        "actions": "⚡ اقدامات",
-        "report_type": "📑 رپورٹ کی قسم",
-        "from_date": "📅 شروع تاریخ",
-        "to_date": "📅 آخری تاریخ",
-        "view_report": "👁 رپورٹ دیکھیں",
-        "download_csv": "📥 CSV ڈاؤن لوڈ",
-        "download_pdf": "📥 PDF ڈاؤن لوڈ",
-        "print": "🖨 پرنٹ",
-        "monthly_flow": "📊 ماہانہ بہاؤ",
-        "top_accounts": "🏆 اہم اکاؤنٹس",
-        "settings_title": "⚙ سال کی سیٹنگز",
-        "save_settings": "💾 سیٹنگز محفوظ",
-        "entry_type": "🔖 انٹری قسم",
-        "search": "🔍 تلاش",
-        "refresh_ledger": "🔄 لیجر ریفریش",
-        "code_hint": "کوڈ لکھتے ہی متعلقہ اکاؤنٹ ہیڈ خود نظر آئے گا۔",
-        "account_not_found": "❌ ہیڈ نہیں ملا",
-        "no_data": "ℹ کوئی ڈیٹا نہیں",
-        "select_year": "سال منتخب کریں",
-        "create_year": "سال بنائیں",
-    }
+        "username": "یوزر نیم", "password": "پاس ورڈ",
+        "login_btn": "لاگ ان", "logout": "لاگ آؤٹ",
+        "tab_income": "انکم انٹری", "tab_expense": "ادائیگی انٹری",
+        "tab_reports": "رپورٹس", "tab_ledger": "لیجر",
+        "tab_accounts": "اکاؤنٹس", "tab_overview": "جائزہ",
+        "tab_settings": "سیٹنگز", "year": "مالی سال",
+        "language": "زبان",
+        "save_income": "انکم محفوظ کریں", "save_expense": "ادائیگی محفوظ کریں",
+        "date": "تاریخ", "code": "کوڈ", "account_head": "اکاؤنٹ ہیڈ",
+        "branch": "برانچ", "category": "کیٹیگری",
+        "receipt_no": "رسید نمبر", "voucher_no": "واؤچر نمبر",
+        "jv_no": "جے وی نمبر", "description": "تفصیل", "amount": "رقم (روپے)",
+        "save_account_head": "اکاؤنٹ محفوظ",
+        "total_entries": "کل انٹریز", "total_income": "کل آمدن",
+        "total_expense": "کل اخراجات", "net_balance": "خالص بیلنس",
+        "cash_in_hand": "نقد رقم",
+        "report_type": "رپورٹ کی قسم", "from_date": "شروع تاریخ", "to_date": "آخری تاریخ",
+        "view_report": "رپورٹ دیکھیں", "download_csv": "CSV ڈاؤن لوڈ",
+        "monthly_flow": "ماہانہ کیش فلو", "top_accounts": "اہم اکاؤنٹس",
+        "settings_title": "سال کی سیٹنگز", "save_settings": "سیٹنگز محفوظ",
+        "entry_type": "انٹری قسم", "search": "تلاش",
+        "refresh_ledger": "ریفریش", "account_not_found": "اکاؤنٹ نہیں ملا",
+        "no_data": "کوئی ڈیٹا نہیں", "select_year": "سال منتخب کریں",
+        "create_year": "سال بنائیں", "upload_legacy": "پرانا ڈیٹا امپورٹ",
+        "upload_files": "اپلوڈ اور امپورٹ",
+        "new_income": "نئی انکم انٹری", "new_expense": "نئی ادائیگی انٹری",
+        "recent_income": "حالیہ آمدن", "recent_expenses": "حالیہ اخراجات",
+    },
 }
 
 def t(key):
     lang = st.session_state.get("lang", "en")
     return I18N.get(lang, I18N["en"]).get(key, key)
 
-# ---------------- DBF Import Functions (unchanged, only included necessary) ----------------
-BRAND_NAME = "JAMIA MILLIA ISLAMIA AND MSJID MADRASA WALI"
+# ─────────────────────────────────────────────
+#  DBF Import
+# ─────────────────────────────────────────────
 DEFAULT_LEGACY_DIR = Path("uploaded_legacy")
 YEAR_PATTERN = re.compile(r"^JIID(\d{4})\.DBF$", re.IGNORECASE)
 
-# Include all DBF import functions from original (scan_legacy_years, parse_dbf_date, etc.) as in previous response.
-# I'll add them here but they are unchanged.
 def scan_legacy_years(legacy_dir: Path):
     if not legacy_dir.exists():
         return []
-    years = []
-    for item in legacy_dir.iterdir():
-        match = YEAR_PATTERN.match(item.name)
-        if match:
-            years.append(match.group(1))
-    return sorted(set(years))
+    return sorted({YEAR_PATTERN.match(i.name).group(1) for i in legacy_dir.iterdir() if YEAR_PATTERN.match(i.name)})
 
 def parse_dbf_date(value):
     clean = value.strip()
@@ -362,18 +454,13 @@ def parse_dbf_number(value, decimals):
         num = float(clean)
     except ValueError:
         return None
-    if decimals == 0:
-        return int(num)
-    return round(num, decimals)
+    return int(num) if decimals == 0 else round(num, decimals)
 
 def parse_dbf_bool(value):
     return value.strip().upper() in {"Y", "T"}
 
 def iterate_dbf(path_or_bytes, is_file=True):
-    if is_file:
-        handle = open(path_or_bytes, "rb")
-    else:
-        handle = BytesIO(path_or_bytes)
+    handle = open(path_or_bytes, "rb") if is_file else BytesIO(path_or_bytes)
     try:
         header = handle.read(32)
         if len(header) < 32:
@@ -388,8 +475,7 @@ def iterate_dbf(path_or_bytes, is_file=True):
                 break
             name = descriptor[:11].split(b"\x00", 1)[0].decode("ascii", errors="ignore")
             field_type = chr(descriptor[11])
-            length = descriptor[16]
-            decimals = descriptor[17]
+            length, decimals = descriptor[16], descriptor[17]
             fields.append((name, field_type, length, decimals))
         handle.seek(header_length)
         for row_index in range(1, record_count + 1):
@@ -401,7 +487,7 @@ def iterate_dbf(path_or_bytes, is_file=True):
             position = 1
             row = {}
             for name, field_type, length, decimals in fields:
-                chunk = raw_record[position:position+length]
+                chunk = raw_record[position:position + length]
                 position += length
                 text = chunk.decode("cp1252", errors="ignore")
                 if field_type == "D":
@@ -416,12 +502,12 @@ def iterate_dbf(path_or_bytes, is_file=True):
     finally:
         handle.close()
 
-def choose_account_record(current, candidate):
+def _choose_account_record(current, candidate):
     if current is None:
         return candidate
-    score_current = (1 if current["atype"] else 0, len(current["name"].strip()))
-    score_candidate = (1 if candidate["atype"] else 0, len(candidate["name"].strip()))
-    return candidate if score_candidate >= score_current else current
+    sc = (1 if current["atype"] else 0, len(current["name"].strip()))
+    sn = (1 if candidate["atype"] else 0, len(candidate["name"].strip()))
+    return candidate if sn >= sc else current
 
 def import_accounts(conn, legacy_dir):
     path = legacy_dir / "JIICODED.DBF"
@@ -433,13 +519,13 @@ def import_accounts(conn, legacy_dir):
         if not code:
             continue
         candidate = {"code": code.zfill(3), "name": str(row.get("NAME") or "").strip(), "atype": str(row.get("ATYPE") or "").strip()}
-        deduped[candidate["code"]] = choose_account_record(deduped.get(candidate["code"]), candidate)
+        deduped[candidate["code"]] = _choose_account_record(deduped.get(candidate["code"]), candidate)
     for rec in deduped.values():
-        conn.execute("""INSERT INTO accounts (code, name, atype, updated_at) VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+        conn.execute("""INSERT INTO accounts (code,name,atype,updated_at) VALUES (?,?,?,CURRENT_TIMESTAMP)
                         ON CONFLICT(code) DO UPDATE SET
-                        name = excluded.name,
-                        atype = CASE WHEN excluded.atype <> '' THEN excluded.atype ELSE accounts.atype END,
-                        updated_at = CURRENT_TIMESTAMP""",
+                        name=excluded.name,
+                        atype=CASE WHEN excluded.atype<>'' THEN excluded.atype ELSE accounts.atype END,
+                        updated_at=CURRENT_TIMESTAMP""",
                      (rec["code"], rec["name"], rec["atype"]))
     conn.commit()
     return len(deduped)
@@ -447,7 +533,7 @@ def import_accounts(conn, legacy_dir):
 def ensure_account(conn, code):
     if not code:
         return
-    conn.execute("INSERT INTO accounts (code, name, atype, updated_at) VALUES (?, '', '', CURRENT_TIMESTAMP) ON CONFLICT(code) DO NOTHING",
+    conn.execute("INSERT INTO accounts(code,name,atype,updated_at) VALUES(?,'',' ',CURRENT_TIMESTAMP) ON CONFLICT(code) DO NOTHING",
                  (code.zfill(3),))
 
 def import_control_settings(conn, legacy_dir, year):
@@ -461,13 +547,11 @@ def import_control_settings(conn, legacy_dir, year):
             break
     if not chosen:
         return 0
-    conn.execute("""INSERT INTO control_settings (year, start_date, end_date, cash_in_hand, min_cash, max_cash, last_jvno, updated_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-                    ON CONFLICT(year) DO UPDATE SET
-                    start_date = excluded.start_date, end_date = excluded.end_date,
-                    cash_in_hand = excluded.cash_in_hand, min_cash = excluded.min_cash,
-                    max_cash = excluded.max_cash, last_jvno = excluded.last_jvno,
-                    updated_at = CURRENT_TIMESTAMP""",
+    conn.execute("""INSERT INTO control_settings (year,start_date,end_date,cash_in_hand,min_cash,max_cash,last_jvno,updated_at)
+                    VALUES (?,?,?,?,?,?,?,CURRENT_TIMESTAMP)
+                    ON CONFLICT(year) DO UPDATE SET start_date=excluded.start_date,end_date=excluded.end_date,
+                    cash_in_hand=excluded.cash_in_hand,min_cash=excluded.min_cash,max_cash=excluded.max_cash,
+                    last_jvno=excluded.last_jvno,updated_at=CURRENT_TIMESTAMP""",
                  (year, chosen.get("SDATE"), chosen.get("EDATE"), float(chosen.get("CIH") or 0),
                   float(chosen.get("MINCIN") or 0), float(chosen.get("MAXCIN") or 0), int(chosen.get("JVNO") or 0)))
     conn.commit()
@@ -477,36 +561,34 @@ def import_entries(conn, legacy_dir, year):
     path = legacy_dir / f"JIID{year}.DBF"
     if not path.exists():
         return 0
-    conn.execute("DELETE FROM entries WHERE year = ? AND source_file <> 'MODERN'", (year,))
-    count = 0
+    conn.execute("DELETE FROM entries WHERE year=? AND source_file<>'MODERN'", (year,))
     source_name = path.name.upper()
+    count = 0
     for row_index, row in iterate_dbf(path):
         code = str(row.get("CODE") or "").strip().zfill(3)
         ensure_account(conn, code)
-        conn.execute("""INSERT INTO entries (year, entry_date, jv_no, jv_ext, branch, category, code, description,
-                        receipt_no, voucher_no, entry_kind, income, payment, checked_flag, group_no, source_file, source_row, updated_at)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)""",
-                     (year, row.get("DATE"), row.get("JVNO"), row.get("JVEXT"), str(row.get("BRANCH") or "").strip(),
-                      str(row.get("CATEGORY") or "").strip(), code, str(row.get("DESC1") or "").strip(),
-                      row.get("R_NO"), row.get("V_NO"), str(row.get("CJ") or "").strip(),
-                      float(row.get("INCOME") or 0), float(row.get("PAYMENT") or 0),
-                      1 if row.get("CHECKED") else 0, row.get("GROUP"), source_name, row_index))
+        conn.execute("""INSERT INTO entries (year,entry_date,jv_no,jv_ext,branch,category,code,description,
+                        receipt_no,voucher_no,entry_kind,income,payment,checked_flag,group_no,source_file,source_row,updated_at)
+                        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP)""",
+                     (year, row.get("DATE"), row.get("JVNO"), row.get("JVEXT"),
+                      str(row.get("BRANCH") or "").strip(), str(row.get("CATEGORY") or "").strip(),
+                      code, str(row.get("DESC1") or "").strip(), row.get("R_NO"), row.get("V_NO"),
+                      str(row.get("CJ") or "").strip(), float(row.get("INCOME") or 0),
+                      float(row.get("PAYMENT") or 0), 1 if row.get("CHECKED") else 0,
+                      row.get("GROUP"), source_name, row_index))
         count += 1
     conn.commit()
     return count
 
-def import_year(conn, legacy_dir, year):
-    entries = import_entries(conn, legacy_dir, year)
-    settings = import_control_settings(conn, legacy_dir, year)
-    return {"year": year, "entries": entries, "settings": settings}
-
 def import_all_years(conn, legacy_dir):
     import_accounts(conn, legacy_dir)
-    years = scan_legacy_years(legacy_dir)
-    for y in years:
-        import_year(conn, legacy_dir, y)
+    for y in scan_legacy_years(legacy_dir):
+        import_entries(conn, legacy_dir, y)
+        import_control_settings(conn, legacy_dir, y)
 
-# ---------------- Data Fetch Functions (same as before) ----------------
+# ─────────────────────────────────────────────
+#  Data helpers
+# ─────────────────────────────────────────────
 def get_years():
     conn = get_connection()
     rows = conn.execute("SELECT year, COUNT(*) as entries FROM entries GROUP BY year ORDER BY year").fetchall()
@@ -514,81 +596,92 @@ def get_years():
     return [dict(r) for r in rows]
 
 def get_dashboard(conn, year):
-    summary = conn.execute("""SELECT COUNT(*) AS entries_count, ROUND(COALESCE(SUM(income),0),2) AS total_income,
-                              ROUND(COALESCE(SUM(payment),0),2) AS total_payment,
-                              ROUND(COALESCE(SUM(income-payment),0),2) AS balance,
-                              ROUND(COALESCE(SUM(CASE WHEN entry_kind='B' THEN income-payment ELSE 0 END),0),2) AS opening_balance
-                              FROM entries WHERE year=?""", (year,)).fetchone()
-    monthly = conn.execute("""SELECT substr(entry_date,1,7) as month, ROUND(SUM(income),2) as income, ROUND(SUM(payment),2) as payment
-                              FROM entries WHERE year=? AND entry_date IS NOT NULL GROUP BY month ORDER BY month""", (year,)).fetchall()
-    top_acc = conn.execute("""SELECT e.code, COALESCE(a.name,'') as name, COALESCE(a.atype,'') as atype,
-                             ROUND(SUM(e.income),2) as income, ROUND(SUM(e.payment),2) as payment,
-                             ROUND(SUM(e.income-e.payment),2) as balance
-                             FROM entries e LEFT JOIN accounts a ON a.code=e.code
-                             WHERE e.year=? GROUP BY e.code ORDER BY ABS(SUM(e.income-e.payment)) DESC LIMIT 10""", (year,)).fetchall()
+    summary = conn.execute("""
+        SELECT COUNT(*) AS entries_count,
+               ROUND(COALESCE(SUM(income),0),2) AS total_income,
+               ROUND(COALESCE(SUM(payment),0),2) AS total_payment,
+               ROUND(COALESCE(SUM(income-payment),0),2) AS balance
+        FROM entries WHERE year=?""", (year,)).fetchone()
+    monthly = conn.execute("""
+        SELECT substr(entry_date,1,7) as month,
+               ROUND(SUM(income),2) as income,
+               ROUND(SUM(payment),2) as payment
+        FROM entries WHERE year=? AND entry_date IS NOT NULL
+        GROUP BY month ORDER BY month""", (year,)).fetchall()
+    top_acc = conn.execute("""
+        SELECT e.code, COALESCE(a.name,'') as name,
+               ROUND(SUM(e.income),2) as income,
+               ROUND(SUM(e.payment),2) as payment,
+               ROUND(SUM(e.income-e.payment),2) as balance
+        FROM entries e LEFT JOIN accounts a ON a.code=e.code
+        WHERE e.year=? GROUP BY e.code
+        ORDER BY ABS(SUM(e.income-e.payment)) DESC LIMIT 10""", (year,)).fetchall()
     settings = conn.execute("SELECT * FROM control_settings WHERE year=?", (year,)).fetchone()
-    return {"summary": dict(summary), "monthly": [dict(r) for r in monthly], "top_accounts": [dict(r) for r in top_acc],
-            "settings": dict(settings) if settings else None}
+    return {
+        "summary": dict(summary),
+        "monthly": [dict(r) for r in monthly],
+        "top_accounts": [dict(r) for r in top_acc],
+        "settings": dict(settings) if settings else None,
+    }
 
-def fetch_entries(conn, year, date_from=None, date_to=None, code=None, search=None, mode=None, limit=None, sort_ascending=False):
-    sql = ["SELECT e.*, COALESCE(a.name,'') as account_name FROM entries e LEFT JOIN accounts a ON a.code=e.code WHERE e.year=?"]
+def fetch_entries(conn, year, date_from=None, date_to=None, code=None,
+                  search=None, mode=None, limit=None, sort_ascending=False):
+    sql = ["SELECT e.*, COALESCE(a.name,'') as account_name FROM entries e "
+           "LEFT JOIN accounts a ON a.code=e.code WHERE e.year=?"]
     params = [year]
     if date_from:
-        sql.append("AND COALESCE(e.entry_date,'') >= ?")
-        params.append(date_from)
+        sql.append("AND COALESCE(e.entry_date,'') >= ?"); params.append(date_from)
     if date_to:
-        sql.append("AND COALESCE(e.entry_date,'') <= ?")
-        params.append(date_to)
+        sql.append("AND COALESCE(e.entry_date,'') <= ?"); params.append(date_to)
     if code:
-        sql.append("AND e.code = ?")
-        params.append(code.zfill(3))
+        sql.append("AND e.code=?"); params.append(code.zfill(3))
     if search:
         wild = f"%{search}%"
         sql.append("AND (e.description LIKE ? OR e.category LIKE ? OR e.code LIKE ? OR a.name LIKE ?)")
         params.extend([wild, wild, wild, wild])
-    if mode == 'income':
+    if mode == "income":
         sql.append("AND e.income > 0")
-    elif mode == 'expense':
+    elif mode == "expense":
         sql.append("AND e.payment > 0")
     order = "ASC" if sort_ascending else "DESC"
     sql.append(f"ORDER BY COALESCE(e.entry_date,'') {order}, e.id {order}")
     if limit:
-        sql.append("LIMIT ?")
-        params.append(limit)
+        sql.append("LIMIT ?"); params.append(limit)
     return conn.execute("\n".join(sql), params).fetchall()
 
 def get_accounts(conn, year):
-    rows = conn.execute("""SELECT a.code, a.name, a.atype,
-                          ROUND(COALESCE(SUM(e.income),0),2) as income,
-                          ROUND(COALESCE(SUM(e.payment),0),2) as payment,
-                          ROUND(COALESCE(SUM(e.income-e.payment),0),2) as balance,
-                          COUNT(e.id) as entries_count
-                          FROM accounts a LEFT JOIN entries e ON e.code=a.code AND e.year=?
-                          GROUP BY a.code ORDER BY a.code""", (year,)).fetchall()
+    rows = conn.execute("""
+        SELECT a.code, a.name, a.atype,
+               ROUND(COALESCE(SUM(e.income),0),2) as income,
+               ROUND(COALESCE(SUM(e.payment),0),2) as payment,
+               ROUND(COALESCE(SUM(e.income-e.payment),0),2) as balance,
+               COUNT(e.id) as entries_count
+        FROM accounts a LEFT JOIN entries e ON e.code=a.code AND e.year=?
+        GROUP BY a.code ORDER BY a.code""", (year,)).fetchall()
     return [dict(r) for r in rows]
 
 def upsert_entry(conn, payload, entry_id=None):
-    year = payload.get("year")
-    code = payload.get("code").zfill(3)
+    year = payload["year"]
+    code = payload["code"].zfill(3)
     ensure_account(conn, code)
-    values = (year, payload.get("entry_date"), payload.get("jv_no"), payload.get("jv_ext"),
-              payload.get("branch","G"), payload.get("category","GENERAL"), code,
-              payload.get("description"), payload.get("receipt_no"), payload.get("voucher_no"),
-              payload.get("entry_kind","C"), payload.get("income",0), payload.get("payment",0),
-              1 if payload.get("checked_flag") else 0, payload.get("group_no"))
+    vals = (year, payload.get("entry_date"), payload.get("jv_no"), payload.get("jv_ext"),
+            payload.get("branch", "G"), payload.get("category", "GENERAL"), code,
+            payload.get("description", ""), payload.get("receipt_no"), payload.get("voucher_no"),
+            payload.get("entry_kind", "C"), payload.get("income", 0), payload.get("payment", 0),
+            1 if payload.get("checked_flag") else 0, payload.get("group_no"))
     if entry_id is None:
-        cur = conn.execute("""INSERT INTO entries (year, entry_date, jv_no, jv_ext, branch, category, code, description,
-                              receipt_no, voucher_no, entry_kind, income, payment, checked_flag, group_no, source_file, updated_at)
-                              VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,'MODERN', CURRENT_TIMESTAMP)""", values)
+        cur = conn.execute("""INSERT INTO entries (year,entry_date,jv_no,jv_ext,branch,category,code,description,
+                              receipt_no,voucher_no,entry_kind,income,payment,checked_flag,group_no,source_file,updated_at)
+                              VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,'MODERN',CURRENT_TIMESTAMP)""", vals)
         conn.commit()
         return cur.lastrowid
     else:
         existing = conn.execute("SELECT year FROM entries WHERE id=?", (entry_id,)).fetchone()
         if not existing or existing["year"] != year:
             raise ValueError("Entry not found or year mismatch")
-        conn.execute("""UPDATE entries SET year=?, entry_date=?, jv_no=?, jv_ext=?, branch=?, category=?, code=?,
-                        description=?, receipt_no=?, voucher_no=?, entry_kind=?, income=?, payment=?, checked_flag=?,
-                        group_no=?, updated_at=CURRENT_TIMESTAMP WHERE id=?""", values + (entry_id,))
+        conn.execute("""UPDATE entries SET year=?,entry_date=?,jv_no=?,jv_ext=?,branch=?,category=?,code=?,
+                        description=?,receipt_no=?,voucher_no=?,entry_kind=?,income=?,payment=?,checked_flag=?,
+                        group_no=?,updated_at=CURRENT_TIMESTAMP WHERE id=?""", vals + (entry_id,))
         conn.commit()
         return entry_id
 
@@ -597,391 +690,511 @@ def delete_entry(conn, entry_id, year):
     conn.commit()
 
 def upsert_account(conn, code, name, atype):
-    conn.execute("""INSERT INTO accounts (code, name, atype, updated_at) VALUES (?,?,?,CURRENT_TIMESTAMP)
-                    ON CONFLICT(code) DO UPDATE SET name=excluded.name, atype=excluded.atype, updated_at=CURRENT_TIMESTAMP""",
+    conn.execute("""INSERT INTO accounts(code,name,atype,updated_at) VALUES(?,?,?,CURRENT_TIMESTAMP)
+                    ON CONFLICT(code) DO UPDATE SET name=excluded.name,atype=excluded.atype,
+                    updated_at=CURRENT_TIMESTAMP""",
                  (code.zfill(3), name, atype.upper()))
     conn.commit()
 
 def upsert_settings(conn, year, start_date, end_date, cash_in_hand, min_cash, max_cash, last_jvno):
-    conn.execute("""INSERT INTO control_settings (year, start_date, end_date, cash_in_hand, min_cash, max_cash, last_jvno, updated_at)
-                    VALUES (?,?,?,?,?,?,?,CURRENT_TIMESTAMP)
-                    ON CONFLICT(year) DO UPDATE SET start_date=excluded.start_date, end_date=excluded.end_date,
-                    cash_in_hand=excluded.cash_in_hand, min_cash=excluded.min_cash, max_cash=excluded.max_cash,
-                    last_jvno=excluded.last_jvno, updated_at=CURRENT_TIMESTAMP""",
+    conn.execute("""INSERT INTO control_settings(year,start_date,end_date,cash_in_hand,min_cash,max_cash,last_jvno,updated_at)
+                    VALUES(?,?,?,?,?,?,?,CURRENT_TIMESTAMP)
+                    ON CONFLICT(year) DO UPDATE SET start_date=excluded.start_date,end_date=excluded.end_date,
+                    cash_in_hand=excluded.cash_in_hand,min_cash=excluded.min_cash,max_cash=excluded.max_cash,
+                    last_jvno=excluded.last_jvno,updated_at=CURRENT_TIMESTAMP""",
                  (year, start_date, end_date, cash_in_hand, min_cash, max_cash, last_jvno))
     conn.commit()
 
 def build_report_data(conn, report_type, year, date_from=None, date_to=None):
-    if report_type == "ledger":
+    if report_type in ("ledger", "Ledger / لیجر"):
         rows = fetch_entries(conn, year, date_from=date_from, date_to=date_to, sort_ascending=True)
-        columns = ["Date","Code","Account","Description","Receipt","Voucher","Income","Expense"]
-        data = []
-        for r in rows:
-            data.append([r["entry_date"] or "", r["code"], r["account_name"], r["description"],
-                         r["receipt_no"] or "", r["voucher_no"] or "", r["income"], r["payment"]])
-    elif report_type == "cashbook":
+        cols = ["Date", "Code", "Account", "Description", "Receipt", "Voucher", "Income", "Expense"]
+        data = [[r["entry_date"] or "", r["code"], r["account_name"], r["description"],
+                 r["receipt_no"] or "", r["voucher_no"] or "", r["income"], r["payment"]] for r in rows]
+    elif report_type in ("cashbook", "Cash Book / کیش بک"):
         rows = fetch_entries(conn, year, date_from=date_from, date_to=date_to, sort_ascending=True)
-        columns = ["Date","Code","Account","Description","Receipt","Payment","Balance"]
+        cols = ["Date", "Code", "Account", "Description", "Receipt", "Payment", "Running Balance"]
         running = 0
         data = []
         for r in rows:
             running += r["income"] - r["payment"]
             data.append([r["entry_date"] or "", r["code"], r["account_name"], r["description"],
-                         r["income"], r["payment"], running])
-    elif report_type == "trial-balance":
-        rows = conn.execute("""SELECT e.code, COALESCE(a.name,'') as name, COALESCE(a.atype,'') as atype,
-                              SUM(e.income) as income, SUM(e.payment) as payment
-                              FROM entries e LEFT JOIN accounts a ON a.code=e.code
-                              WHERE e.year=? GROUP BY e.code""", (year,)).fetchall()
-        columns = ["Code","Account","Type","Income","Expense","Balance"]
-        data = [[r["code"], r["name"], r["atype"], r["income"], r["payment"], r["income"]-r["payment"]] for r in rows]
-    elif report_type == "opening-balance":
-        cutoff = date_from if date_from else (conn.execute("SELECT start_date FROM control_settings WHERE year=?", (year,)).fetchone() or {"start_date":""})["start_date"]
-        rows = conn.execute("""SELECT e.code, COALESCE(a.name,'') as name,
-                              SUM(e.income) as income, SUM(e.payment) as payment
-                              FROM entries e LEFT JOIN accounts a ON a.code=e.code
-                              WHERE e.year=? AND (? IS NULL OR COALESCE(e.entry_date,'') <= ?)
-                              GROUP BY e.code""", (year, cutoff, cutoff)).fetchall()
-        columns = ["Code","Account","Income","Expense","Balance"]
-        data = [[r["code"], r["name"], r["income"], r["payment"], r["income"]-r["payment"]] for r in rows]
-    elif report_type == "income-expense":
-        rows = conn.execute("""SELECT e.code, COALESCE(a.name,'') as name, COALESCE(a.atype,'') as atype,
-                              SUM(e.income) as income, SUM(e.payment) as payment
-                              FROM entries e LEFT JOIN accounts a ON a.code=e.code
-                              WHERE e.year=? GROUP BY e.code""", (year,)).fetchall()
-        columns = ["Code","Account","Type","Income","Expense","Net"]
-        data = [[r["code"], r["name"], r["atype"], r["income"], r["payment"], r["income"]-r["payment"]] for r in rows]
+                         r["income"], r["payment"], round(running, 2)])
+    elif report_type in ("trial-balance", "Trial Balance / میزان"):
+        rows = conn.execute("""
+            SELECT e.code, COALESCE(a.name,'') as name, COALESCE(a.atype,'') as atype,
+                   SUM(e.income) as income, SUM(e.payment) as payment
+            FROM entries e LEFT JOIN accounts a ON a.code=e.code
+            WHERE e.year=? GROUP BY e.code""", (year,)).fetchall()
+        cols = ["Code", "Account", "Type", "Income", "Expense", "Balance"]
+        data = [[r["code"], r["name"], r["atype"], r["income"], r["payment"], r["income"] - r["payment"]] for r in rows]
+    elif report_type in ("income-expense", "Income & Expense / آمدن و اخراجات"):
+        rows = conn.execute("""
+            SELECT e.code, COALESCE(a.name,'') as name, COALESCE(a.atype,'') as atype,
+                   SUM(e.income) as income, SUM(e.payment) as payment
+            FROM entries e LEFT JOIN accounts a ON a.code=e.code
+            WHERE e.year=? GROUP BY e.code""", (year,)).fetchall()
+        cols = ["Code", "Account", "Type", "Income", "Expense", "Net"]
+        data = [[r["code"], r["name"], r["atype"], r["income"], r["payment"], r["income"] - r["payment"]] for r in rows]
     else:
         return None, None
-    return columns, data
+    return cols, data
 
-# ---------------- Login Page ----------------
+# ─────────────────────────────────────────────
+#  UI helpers
+# ─────────────────────────────────────────────
+def page_header(title, subtitle=""):
+    st.markdown(f"""
+    <div class="page-header">
+        <h1>{title}</h1>
+        {'<p>' + subtitle + '</p>' if subtitle else ''}
+    </div>""", unsafe_allow_html=True)
+
+def kpi_row(income, expense, balance, entries):
+    st.markdown(f"""
+    <div class="kpi-grid">
+        <div class="kpi-card green">
+            <div class="kpi-label">{t('total_income')}</div>
+            <div class="kpi-value">Rs. {income:,.0f}</div>
+            <div class="kpi-sub">{entries} {t('total_entries')}</div>
+        </div>
+        <div class="kpi-card orange">
+            <div class="kpi-label">{t('total_expense')}</div>
+            <div class="kpi-value">Rs. {expense:,.0f}</div>
+        </div>
+        <div class="kpi-card blue">
+            <div class="kpi-label">{t('net_balance')}</div>
+            <div class="kpi-value">Rs. {balance:,.0f}</div>
+        </div>
+    </div>""", unsafe_allow_html=True)
+
+def account_head_widget(conn, code_key, label=""):
+    """Show live account head lookup below the code input."""
+    code = st.session_state.get(code_key, "")
+    if code and len(code.strip()) > 0:
+        acc = conn.execute("SELECT name, atype FROM accounts WHERE code=?", (code.strip().zfill(3),)).fetchone()
+        if acc and acc["name"]:
+            display = acc["name"] + (f" [{acc['atype']}]" if acc["atype"].strip() else "")
+            st.markdown(f'<div class="head-found">✅ {display}</div>', unsafe_allow_html=True)
+        else:
+            st.markdown(f'<div class="head-missing">❌ {t("account_not_found")}</div>', unsafe_allow_html=True)
+
+# ─────────────────────────────────────────────
+#  Login page
+# ─────────────────────────────────────────────
 def login_page():
-    col1, col2, col3 = st.columns([1,2,1])
+    st.markdown("""
+    <div class="login-wrap">
+        <div class="login-logo">
+            <h1>📚 Madrasa Accounting</h1>
+            <div class="urdu-title">مدرسہ مالیاتی نظام</div>
+            <div class="sub">Jamia Millia Islamia & Masjid Madrasa Wali, Faisalabad</div>
+        </div>
+    </div>""", unsafe_allow_html=True)
+
+    col1, col2, col3 = st.columns([1, 1.4, 1])
     with col2:
-        st.markdown("<div style='text-align:center;'>", unsafe_allow_html=True)
-        st.image("https://img.icons8.com/clouds/100/accounting.png", width=80)  # generic icon
-        st.markdown(f"<h1 style='color:#0e695c;'>{t('login_title')}</h1>", unsafe_allow_html=True)
-        st.markdown(f"<p style='color:#5e6e87;'>{BRAND_NAME}</p>", unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown('<div class="login-card">', unsafe_allow_html=True)
         with st.form("login_form"):
-            username = st.text_input(t("username"), value="admin")
-            password = st.text_input(t("password"), type="password", value="admin123")
-            if st.form_submit_button(t("login_btn")):
+            username = st.text_input("👤 " + t("username"), value="admin")
+            password = st.text_input("🔒 " + t("password"), type="password")
+            submitted = st.form_submit_button("🔐 " + t("login_btn"), use_container_width=True)
+            if submitted:
                 conn = get_connection()
                 user = conn.execute("SELECT * FROM app_users WHERE username=?", (username,)).fetchone()
-                if user and bcrypt.checkpw(password.encode('utf-8'), user["password_hash"].encode('utf-8')):
+                conn.close()
+                if user and bcrypt.checkpw(password.encode(), user["password_hash"].encode()):
                     st.session_state.authenticated = True
                     st.session_state.user = user["username"]
                     st.session_state.display_name = user["display_name"]
-                    st.session_state.lang = "en"
-                    conn.close()
                     st.rerun()
                 else:
-                    st.error("Invalid username or password")
-                conn.close()
+                    st.error("❌ Invalid username or password")
+        st.markdown("</div>", unsafe_allow_html=True)
 
-# ---------------- Main App with Colorful UI ----------------
+# ─────────────────────────────────────────────
+#  Main app
+# ─────────────────────────────────────────────
 def main_app():
-    st.set_page_config(page_title="Madrasa Accounting", layout="wide", initial_sidebar_state="expanded")
-    local_css()
-    # Apply RTL if Urdu
-    if st.session_state.get("lang") == "ur":
-        st.markdown('<script>document.body.classList.add("rtl");</script>', unsafe_allow_html=True)
-    else:
-        st.markdown('<script>document.body.classList.remove("rtl");</script>', unsafe_allow_html=True)
+    st.set_page_config(
+        page_title="Madrasa Accounting",
+        page_icon="📚",
+        layout="wide",
+        initial_sidebar_state="expanded",
+    )
+    inject_css()
 
-    # Sidebar
+    # ── Sidebar ──────────────────────────────
     with st.sidebar:
         st.markdown(f"""
-        <div style="text-align:center; margin-bottom:20px;">
-            <h2 style="color:#0e695c; font-weight:700;">📚 {BRAND_NAME}</h2>
-            <p style="color:#5e6e87;">👤 {st.session_state.get('display_name','')}</p>
-        </div>
-        """, unsafe_allow_html=True)
+        <div style="padding:1rem 0.5rem 0.5rem;">
+            <div style="font-size:1.1rem;font-weight:700;color:#a8e6c8;">📚 {BRAND_URDU}</div>
+            <div style="font-size:0.75rem;color:#6baf8c;margin-top:2px;">👤 {st.session_state.get('display_name','')}</div>
+        </div>""", unsafe_allow_html=True)
 
-        # Year selection
+        st.markdown("---")
+        # Year
         years = get_years()
         year_list = [y["year"] for y in years]
-        if not year_list:
-            st.warning("No years available")
-            selected_year = st.text_input(t("select_year"), value=datetime.now().year)
-            if st.button(t("create_year")):
-                conn = get_connection()
-                conn.execute("INSERT OR IGNORE INTO control_settings (year) VALUES (?)", (selected_year,))
-                conn.commit()
-                conn.close()
-                st.rerun()
+        if year_list:
+            selected_year = st.selectbox("📅 " + t("year"), year_list, index=len(year_list) - 1)
         else:
-            selected_year = st.selectbox(t("year"), year_list, index=len(year_list)-1)
+            st.warning("No years. Create one below.")
+            new_yr = st.text_input(t("select_year"), value=str(datetime.now().year))
+            if st.button(t("create_year")):
+                c = get_connection()
+                c.execute("INSERT OR IGNORE INTO control_settings (year) VALUES (?)", (new_yr,))
+                c.commit(); c.close()
+                st.rerun()
+            selected_year = str(datetime.now().year)
         st.session_state.year = selected_year
 
-        # Language toggle
-        lang_names = ["🇬🇧 English", "🇵🇰 اردو"]
-        lang_index = 0 if st.session_state.get("lang","en")=="en" else 1
-        lang_choice = st.radio(t("language"), lang_names, index=lang_index)
-        st.session_state.lang = "en" if lang_choice.startswith("🇬🇧") else "ur"
+        # Language
+        lang_choice = st.radio("🌐 " + t("language"), ["🇬🇧 English", "🇵🇰 اردو"],
+                                index=0 if st.session_state.get("lang", "en") == "en" else 1,
+                                horizontal=True)
+        st.session_state.lang = "en" if "English" in lang_choice else "ur"
 
         st.markdown("---")
-        # Navigation with colorful buttons
-        nav_options = {
-            t("tab_income"): "💰",
-            t("tab_expense"): "💸",
-            t("tab_reports"): "📊",
-            t("tab_ledger"): "📒",
-            t("tab_accounts"): "🗂",
-            t("tab_overview"): "📈",
-            t("tab_settings"): "⚙",
-        }
-        view = None
-        for label, icon in nav_options.items():
-            if st.button(f"{icon} {label}", use_container_width=True):
-                view = label
+        # Navigation
+        st.markdown('<div class="section-title">Navigation</div>', unsafe_allow_html=True)
+        VIEWS = [
+            ("💰", t("tab_income")),
+            ("💸", t("tab_expense")),
+            ("📈", t("tab_overview")),
+            ("📒", t("tab_ledger")),
+            ("📊", t("tab_reports")),
+            ("🗂", t("tab_accounts")),
+            ("⚙", t("tab_settings")),
+        ]
+        if "view" not in st.session_state:
+            st.session_state.view = VIEWS[0][1]
+        for icon, label in VIEWS:
+            if st.button(f"{icon}  {label}", use_container_width=True, key=f"nav_{label}"):
                 st.session_state.view = label
 
-        # Upload section
         st.markdown("---")
-        st.subheader(t("upload_legacy"))
-        uploaded_files = st.file_uploader("Choose DBF files", accept_multiple_files=True, type=["dbf","DBF","acb","ACB","cdx","CDX","fpt","FPT"])
-        if uploaded_files and st.button(t("upload_files")):
+        # DBF import
+        st.markdown('<div class="section-title">' + t("upload_legacy") + '</div>', unsafe_allow_html=True)
+        uploaded_files = st.file_uploader("DBF files", accept_multiple_files=True, type=["dbf", "DBF"])
+        if uploaded_files and st.button("📥 " + t("upload_files")):
             save_dir = Path("uploaded_legacy") / datetime.now().strftime("%Y%m%d_%H%M%S")
             save_dir.mkdir(parents=True, exist_ok=True)
             for f in uploaded_files:
-                with open(save_dir / f.name, "wb") as out:
-                    out.write(f.getbuffer())
-            conn = get_connection()
-            import_all_years(conn, save_dir)
-            conn.close()
-            st.success("✅ Files imported successfully!")
+                (save_dir / f.name).write_bytes(f.getbuffer())
+            c = get_connection()
+            import_all_years(c, save_dir)
+            c.close()
+            st.success("✅ Imported!")
             st.rerun()
 
-        if st.button(f"🚪 {t('logout')}", use_container_width=True):
+        st.markdown("---")
+        if st.button("🚪 " + t("logout"), use_container_width=True):
             st.session_state.authenticated = False
             st.rerun()
 
-    # Main content
-    if "view" not in st.session_state:
-        st.session_state.view = t("tab_income")
-
-    view = st.session_state.view
+    # ── Main content ──────────────────────────
+    view = st.session_state.get("view", VIEWS[0][1])
     conn = get_connection()
     year = st.session_state.year
 
-    # Colorful header for each section
+    # ── Income Entry ─────────────────────────
     if view == t("tab_income"):
-        colored_header("💰 " + t("tab_income"), t("quickIncomeNote"))
-        col1, col2 = st.columns(2)
+        page_header("💰 " + t("tab_income"), BRAND_NAME + " · " + year)
+        col1, col2 = st.columns([1, 1], gap="large")
+
         with col1:
-            with st.form("income_form"):
-                st.markdown("### ✍️ New Income Entry")
-                date = st.date_input(t("date"))
-                code = st.text_input(t("code"), max_chars=3, key="inc_code")
-                # auto account head
-                head_val = ""
+            st.markdown('<div class="form-card"><h3>✍️ ' + t("new_income") + '</h3>', unsafe_allow_html=True)
+            with st.form("income_form", clear_on_submit=True):
+                d1, d2 = st.columns(2)
+                date = d1.date_input(t("date"))
+                jv = d2.number_input(t("jv_no"), min_value=0, value=0, step=1)
+                code = st.text_input(t("code"), max_chars=3, key="inc_code_inp",
+                                     help="3-digit account code")
                 if code:
-                    acc = conn.execute("SELECT name, atype FROM accounts WHERE code=?", (code.zfill(3),)).fetchone()
-                    head_val = f"{acc['name']} ({acc['atype']})" if acc and acc['atype'] else (acc['name'] if acc else t("account_not_found"))
-                st.text_input(t("account_head"), value=head_val, disabled=True)
-                branch = st.text_input(t("branch"), value="G")
-                category = st.text_input(t("category"), value="GENERAL")
+                    acc = conn.execute("SELECT name,atype FROM accounts WHERE code=?",
+                                       (code.zfill(3),)).fetchone()
+                    if acc and acc["name"]:
+                        st.markdown(f'<div class="head-found">✅ {acc["name"]} [{acc["atype"]}]</div>',
+                                    unsafe_allow_html=True)
+                    else:
+                        st.markdown(f'<div class="head-missing">❌ {t("account_not_found")}</div>',
+                                    unsafe_allow_html=True)
+
+                b1, b2 = st.columns(2)
+                branch = b1.text_input(t("branch"), value="G")
+                category = b2.text_input(t("category"), value="GENERAL")
                 receipt = st.number_input(t("receipt_no"), min_value=0, value=0, step=1)
-                jv = st.number_input(t("jv_no"), min_value=0, value=0, step=1)
-                desc = st.text_area(t("description"))
+                desc = st.text_area(t("description"), height=80)
                 amount = st.number_input(t("amount"), min_value=0.0, format="%.2f")
-                submitted = st.form_submit_button(t("save_income"))
-                if submitted:
+                if st.form_submit_button("💾 " + t("save_income"), use_container_width=True):
                     if not code or not date:
-                        st.error("Code and Date required")
+                        st.error("Code and Date are required")
+                    elif amount <= 0:
+                        st.error("Amount must be greater than 0")
                     else:
-                        payload = {
-                            "year": year,
-                            "entry_date": date.isoformat(),
-                            "code": code.zfill(3),
-                            "branch": branch, "category": category,
-                            "receipt_no": receipt, "jv_no": jv,
-                            "description": desc, "income": amount, "payment": 0,
-                            "entry_kind": "C"
-                        }
                         try:
-                            upsert_entry(conn, payload)
-                            st.success("✅ Income saved")
+                            upsert_entry(conn, {
+                                "year": year, "entry_date": date.isoformat(),
+                                "code": code.zfill(3), "branch": branch, "category": category,
+                                "receipt_no": receipt, "jv_no": jv, "description": desc,
+                                "income": amount, "payment": 0, "entry_kind": "C",
+                            })
+                            st.success("✅ Income saved successfully!")
                         except Exception as e:
                             st.error(str(e))
+            st.markdown("</div>", unsafe_allow_html=True)
+
         with col2:
-            st.markdown("### 🕒 Recent Income")
-            recent = fetch_entries(conn, year, mode="income", limit=10)
+            st.markdown('<div class="section-title">🕒 ' + t("recent_income") + '</div>',
+                        unsafe_allow_html=True)
+            recent = fetch_entries(conn, year, mode="income", limit=15)
             if recent:
-                df = pd.DataFrame([dict(r) for r in recent])[["entry_date","code","account_name","description","income"]]
-                st.dataframe(df.style.format({"income": "{:.2f}"}), use_container_width=True)
+                df = pd.DataFrame([dict(r) for r in recent])[
+                    ["entry_date", "code", "account_name", "description", "income"]]
+                df.columns = ["Date", "Code", "Account", "Description", "Income (Rs.)"]
+                st.dataframe(df.style.format({"Income (Rs.)": "{:,.2f}"}), use_container_width=True, hide_index=True)
             else:
                 st.info(t("no_data"))
 
+    # ── Expense Entry ─────────────────────────
     elif view == t("tab_expense"):
-        colored_header("💸 " + t("tab_expense"), t("quickExpenseNote"))
-        col1, col2 = st.columns(2)
+        page_header("💸 " + t("tab_expense"), BRAND_NAME + " · " + year)
+        col1, col2 = st.columns([1, 1], gap="large")
+
         with col1:
-            with st.form("expense_form"):
-                st.markdown("### ✍️ New Expense Entry")
-                date = st.date_input(t("date"))
-                code = st.text_input(t("code"), max_chars=3, key="exp_code")
-                head_val = ""
+            st.markdown('<div class="form-card"><h3>✍️ ' + t("new_expense") + '</h3>', unsafe_allow_html=True)
+            with st.form("expense_form", clear_on_submit=True):
+                d1, d2 = st.columns(2)
+                date = d1.date_input(t("date"))
+                jv = d2.number_input(t("jv_no"), min_value=0, value=0, step=1)
+                code = st.text_input(t("code"), max_chars=3, key="exp_code_inp")
                 if code:
-                    acc = conn.execute("SELECT name, atype FROM accounts WHERE code=?", (code.zfill(3),)).fetchone()
-                    head_val = f"{acc['name']} ({acc['atype']})" if acc and acc['atype'] else (acc['name'] if acc else t("account_not_found"))
-                st.text_input(t("account_head"), value=head_val, disabled=True)
-                branch = st.text_input(t("branch"), value="G")
-                category = st.text_input(t("category"), value="GENERAL")
-                voucher = st.number_input(t("voucher_no"), min_value=0, value=0, step=1)
-                jv = st.number_input(t("jv_no"), min_value=0, value=0, step=1)
-                desc = st.text_area(t("description"))
-                amount = st.number_input(t("amount"), min_value=0.0, format="%.2f")
-                submitted = st.form_submit_button(t("save_expense"))
-                if submitted:
-                    if not code or not date:
-                        st.error("Code and Date required")
+                    acc = conn.execute("SELECT name,atype FROM accounts WHERE code=?",
+                                       (code.zfill(3),)).fetchone()
+                    if acc and acc["name"]:
+                        st.markdown(f'<div class="head-found">✅ {acc["name"]} [{acc["atype"]}]</div>',
+                                    unsafe_allow_html=True)
                     else:
-                        payload = {
-                            "year": year,
-                            "entry_date": date.isoformat(),
-                            "code": code.zfill(3),
-                            "branch": branch, "category": category,
-                            "voucher_no": voucher, "jv_no": jv,
-                            "description": desc, "income": 0, "payment": amount,
-                            "entry_kind": "C"
-                        }
+                        st.markdown(f'<div class="head-missing">❌ {t("account_not_found")}</div>',
+                                    unsafe_allow_html=True)
+
+                b1, b2 = st.columns(2)
+                branch = b1.text_input(t("branch"), value="G")
+                category = b2.text_input(t("category"), value="GENERAL")
+                voucher = st.number_input(t("voucher_no"), min_value=0, value=0, step=1)
+                desc = st.text_area(t("description"), height=80)
+                amount = st.number_input(t("amount"), min_value=0.0, format="%.2f")
+                if st.form_submit_button("💾 " + t("save_expense"), use_container_width=True):
+                    if not code or not date:
+                        st.error("Code and Date are required")
+                    elif amount <= 0:
+                        st.error("Amount must be greater than 0")
+                    else:
                         try:
-                            upsert_entry(conn, payload)
-                            st.success("✅ Expense saved")
+                            upsert_entry(conn, {
+                                "year": year, "entry_date": date.isoformat(),
+                                "code": code.zfill(3), "branch": branch, "category": category,
+                                "voucher_no": voucher, "jv_no": jv, "description": desc,
+                                "income": 0, "payment": amount, "entry_kind": "C",
+                            })
+                            st.success("✅ Expense saved successfully!")
                         except Exception as e:
                             st.error(str(e))
+            st.markdown("</div>", unsafe_allow_html=True)
+
         with col2:
-            st.markdown("### 🕒 Recent Expenses")
-            recent = fetch_entries(conn, year, mode="expense", limit=10)
+            st.markdown('<div class="section-title">🕒 ' + t("recent_expenses") + '</div>',
+                        unsafe_allow_html=True)
+            recent = fetch_entries(conn, year, mode="expense", limit=15)
             if recent:
-                df = pd.DataFrame([dict(r) for r in recent])[["entry_date","code","account_name","description","payment"]]
-                st.dataframe(df.style.format({"payment": "{:.2f}"}), use_container_width=True)
+                df = pd.DataFrame([dict(r) for r in recent])[
+                    ["entry_date", "code", "account_name", "description", "payment"]]
+                df.columns = ["Date", "Code", "Account", "Description", "Expense (Rs.)"]
+                st.dataframe(df.style.format({"Expense (Rs.)": "{:,.2f}"}), use_container_width=True, hide_index=True)
             else:
                 st.info(t("no_data"))
 
+    # ── Overview ──────────────────────────────
+    elif view == t("tab_overview"):
+        page_header("📈 " + t("tab_overview"), BRAND_NAME + " · " + year)
+        dash = get_dashboard(conn, year)
+        s = dash["summary"]
+        kpi_row(s["total_income"], s["total_payment"], s["balance"], s["entries_count"])
+
+        if s["entries_count"] > 0:
+            if dash["monthly"]:
+                st.markdown('<div class="section-title">' + t("monthly_flow") + '</div>',
+                            unsafe_allow_html=True)
+                df_m = pd.DataFrame(dash["monthly"]).set_index("month")
+                df_m.columns = ["Income (Rs.)", "Expense (Rs.)"]
+                st.bar_chart(df_m, use_container_width=True, color=["#1db87a", "#e07b20"])
+
+            if dash["top_accounts"]:
+                st.markdown('<div class="section-title">' + t("top_accounts") + '</div>',
+                            unsafe_allow_html=True)
+                df_t = pd.DataFrame(dash["top_accounts"])
+                df_t.columns = ["Code", "Account", "Income", "Expense", "Balance"]
+                st.dataframe(
+                    df_t.style.format({"Income": "{:,.2f}", "Expense": "{:,.2f}", "Balance": "{:,.2f}"}),
+                    use_container_width=True, hide_index=True)
+        else:
+            st.info(t("no_data"))
+
+    # ── Ledger ────────────────────────────────
+    elif view == t("tab_ledger"):
+        page_header("📒 " + t("tab_ledger"), BRAND_NAME + " · " + year)
+        f1, f2, f3 = st.columns([2, 1, 1])
+        search = f1.text_input("🔍 " + t("search"), placeholder="Description, account, code…")
+        code_filter = f2.text_input(t("code"), placeholder="e.g. 025")
+        mode = f3.selectbox(t("entry_type"), ["All", "Income", "Expense"])
+        d1, d2 = st.columns(2)
+        date_from = d1.date_input(t("from_date"), value=None)
+        date_to = d2.date_input(t("to_date"), value=None)
+        mode_map = {"All": None, "Income": "income", "Expense": "expense"}
+
+        if st.button("🔄 " + t("refresh_ledger")):
+            rows = fetch_entries(
+                conn, year,
+                date_from=date_from.isoformat() if date_from else None,
+                date_to=date_to.isoformat() if date_to else None,
+                search=search or None,
+                code=code_filter or None,
+                mode=mode_map[mode],
+                limit=500,
+            )
+            if rows:
+                df = pd.DataFrame([dict(r) for r in rows])[
+                    ["entry_date", "code", "account_name", "description", "income", "payment", "source_file"]]
+                df.columns = ["Date", "Code", "Account", "Description", "Income", "Expense", "Source"]
+                st.dataframe(
+                    df.style.format({"Income": "{:,.2f}", "Expense": "{:,.2f}"}),
+                    use_container_width=True, hide_index=True)
+                # Totals
+                c1, c2, c3 = st.columns(3)
+                c1.metric("Total Income", f"Rs. {df['Income'].sum():,.2f}")
+                c2.metric("Total Expense", f"Rs. {df['Expense'].sum():,.2f}")
+                c3.metric("Net", f"Rs. {(df['Income'].sum()-df['Expense'].sum()):,.2f}")
+            else:
+                st.info(t("no_data"))
+
+    # ── Reports ───────────────────────────────
     elif view == t("tab_reports"):
-        colored_header("📊 " + t("tab_reports"), "Select report type and date range")
-        report_type = st.selectbox(t("report_type"), ["ledger","cashbook","trial-balance","opening-balance","income-expense"])
-        col1, col2 = st.columns(2)
-        date_from = col1.date_input(t("from_date"), value=None)
-        date_to = col2.date_input(t("to_date"), value=None)
-        if st.button(t("view_report")):
-            cols, data = build_report_data(conn, report_type, year,
-                                           date_from.isoformat() if date_from else None,
-                                           date_to.isoformat() if date_to else None)
+        page_header("📊 " + t("tab_reports"), BRAND_NAME + " · " + year)
+        report_options = {
+            "Ledger / لیجر": "ledger",
+            "Cash Book / کیش بک": "cashbook",
+            "Trial Balance / میزان": "trial-balance",
+            "Income & Expense / آمدن و اخراجات": "income-expense",
+        }
+        report_label = st.selectbox("📑 " + t("report_type"), list(report_options.keys()))
+        c1, c2 = st.columns(2)
+        date_from = c1.date_input(t("from_date"), value=None)
+        date_to = c2.date_input(t("to_date"), value=None)
+        if st.button("👁 " + t("view_report")):
+            cols, data = build_report_data(
+                conn, report_options[report_label], year,
+                date_from.isoformat() if date_from else None,
+                date_to.isoformat() if date_to else None,
+            )
             if cols and data:
                 df = pd.DataFrame(data, columns=cols)
-                st.dataframe(df.style.set_properties(**{'background-color': '#f9fafc'}), use_container_width=True)
-                csv = df.to_csv(index=False).encode('utf-8')
-                st.download_button(label=t("download_csv"), data=csv, file_name=f"{report_type}_{year}.csv", mime="text/csv")
+                st.dataframe(df, use_container_width=True, hide_index=True)
+                csv = df.to_csv(index=False).encode("utf-8")
+                st.download_button(
+                    "📥 " + t("download_csv"), data=csv,
+                    file_name=f"{report_options[report_label]}_{year}.csv",
+                    mime="text/csv")
             else:
                 st.info(t("no_data"))
 
-    elif view == t("tab_ledger"):
-        colored_header("📒 " + t("tab_ledger"), "Search and filter entries")
-        col1, col2, col3 = st.columns(3)
-        search = col1.text_input(t("search"))
-        code_filter = col2.text_input(t("code"))
-        mode = col3.selectbox(t("entry_type"), ["All","Income","Expense"])
-        col4, col5 = st.columns(2)
-        date_from = col4.date_input(t("from_date"), value=None)
-        date_to = col5.date_input(t("to_date"), value=None)
-        mode_map = {"All": None, "Income": "income", "Expense": "expense"}
-        if st.button(t("refresh_ledger")):
-            entries = fetch_entries(conn, year,
-                                    date_from=date_from.isoformat() if date_from else None,
-                                    date_to=date_to.isoformat() if date_to else None,
-                                    search=search if search else None,
-                                    code=code_filter if code_filter else None,
-                                    mode=mode_map[mode],
-                                    limit=500)
-            if entries:
-                df = pd.DataFrame([dict(r) for r in entries])[["entry_date","code","account_name","description","income","payment","source_file","id"]]
-                st.dataframe(df.style.applymap(lambda x: 'color: #0e695c' if isinstance(x, (int, float)) and x > 0 else ''), use_container_width=True)
-            else:
-                st.info(t("no_data"))
-
+    # ── Accounts ──────────────────────────────
     elif view == t("tab_accounts"):
-        colored_header("🗂 " + t("tab_accounts"), "Manage account heads")
+        page_header("🗂 " + t("tab_accounts"), BRAND_NAME + " · " + year)
         accounts = get_accounts(conn, year)
         if accounts:
-            df = pd.DataFrame(accounts)[["code","name","atype","entries_count","balance"]]
-            st.dataframe(df.style.format({"balance": "{:.2f}"}), use_container_width=True)
+            df = pd.DataFrame(accounts)
+            df = df[["code", "name", "atype", "entries_count", "income", "payment", "balance"]]
+            df.columns = ["Code", "Account Name", "Type", "Entries", "Income", "Expense", "Balance"]
+            st.dataframe(
+                df.style.format({"Income": "{:,.2f}", "Expense": "{:,.2f}", "Balance": "{:,.2f}"}),
+                use_container_width=True, hide_index=True)
         else:
             st.info(t("no_data"))
-        with st.expander("➕ Add New Account Head"):
+
+        with st.expander("➕ Add / Edit Account Head"):
             with st.form("account_form"):
-                new_code = st.text_input(t("code"), max_chars=3)
-                new_name = st.text_input("Account Name")
-                new_type = st.selectbox("Type", ["BS","TA","PA",""], index=3)
-                if st.form_submit_button(t("save_account_head")):
-                    if new_code:
+                c1, c2, c3 = st.columns([1, 2, 1])
+                new_code = c1.text_input(t("code"), max_chars=3, placeholder="e.g. 048")
+                new_name = c2.text_input("Account Name / اکاؤنٹ نام")
+                new_type = c3.selectbox("Type", ["BS", "TA", "PA", "EX", "CR", ""])
+                if st.form_submit_button("💾 " + t("save_account_head")):
+                    if new_code.strip():
                         upsert_account(conn, new_code, new_name, new_type)
-                        st.success("Account saved")
+                        st.success(f"✅ Account {new_code.zfill(3)} saved!")
                         st.rerun()
                     else:
-                        st.error("Enter a code")
+                        st.error("Account code is required")
 
-    elif view == t("tab_overview"):
-        colored_header("📈 " + t("tab_overview"), "Key performance indicators")
-        dash = get_dashboard(conn, year)
-        if dash["summary"]["entries_count"] > 0:
-            c1, c2, c3 = st.columns(3)
-            with c1:
-                st.markdown("<div class='metric-card income'>", unsafe_allow_html=True)
-                st.metric(t("total_income"), f"{dash['summary']['total_income']:,.2f}")
-                st.markdown("</div>", unsafe_allow_html=True)
-            with c2:
-                st.markdown("<div class='metric-card expense'>", unsafe_allow_html=True)
-                st.metric(t("total_expense"), f"{dash['summary']['total_payment']:,.2f}")
-                st.markdown("</div>", unsafe_allow_html=True)
-            with c3:
-                st.markdown("<div class='metric-card balance'>", unsafe_allow_html=True)
-                st.metric(t("net_balance"), f"{dash['summary']['balance']:,.2f}")
-                st.markdown("</div>", unsafe_allow_html=True)
-            st.markdown("---")
-            st.subheader(t("monthly_flow"))
-            if dash["monthly"]:
-                df_monthly = pd.DataFrame(dash["monthly"]).set_index("month")
-                st.bar_chart(df_monthly[["income","payment"]], use_container_width=True)
-            st.subheader(t("top_accounts"))
-            if dash["top_accounts"]:
-                df_top = pd.DataFrame(dash["top_accounts"])[["code","name","balance"]]
-                st.dataframe(df_top.style.format({"balance": "{:.2f}"}), use_container_width=True)
-            else:
-                st.info(t("no_data"))
-        else:
-            st.info(t("no_data"))
-
+    # ── Settings ──────────────────────────────
     elif view == t("tab_settings"):
-        colored_header("⚙ " + t("tab_settings"), "Configure year parameters")
+        page_header("⚙ " + t("tab_settings"), BRAND_NAME + " · " + year)
         settings = conn.execute("SELECT * FROM control_settings WHERE year=?", (year,)).fetchone()
-        if not settings:
-            settings = {"start_date": "", "end_date": "", "cash_in_hand":0.0, "min_cash":0.0, "max_cash":0.0, "last_jvno":0}
+        s = dict(settings) if settings else {"start_date": "", "end_date": "",
+                                              "cash_in_hand": 0.0, "min_cash": 0.0,
+                                              "max_cash": 0.0, "last_jvno": 0}
+        st.markdown('<div class="form-card"><h3>⚙ ' + t("settings_title") + ' — ' + year + '</h3>',
+                    unsafe_allow_html=True)
         with st.form("settings_form"):
-            col1, col2 = st.columns(2)
-            start = col1.text_input("Start Date", value=settings["start_date"] or "")
-            end = col2.text_input("End Date", value=settings["end_date"] or "")
-            cih = col1.number_input(t("cash_in_hand"), value=float(settings["cash_in_hand"]))
-            minc = col2.number_input("Min Cash", value=float(settings["min_cash"]))
-            maxc = col1.number_input("Max Cash", value=float(settings["max_cash"]))
-            jvno = col2.number_input("Last JV No", value=int(settings["last_jvno"]))
-            if st.form_submit_button(t("save_settings")):
+            c1, c2 = st.columns(2)
+            start = c1.text_input("📅 Start Date (YYYY-MM-DD)", value=s.get("start_date") or "")
+            end = c2.text_input("📅 End Date (YYYY-MM-DD)", value=s.get("end_date") or "")
+            cih = c1.number_input(t("cash_in_hand"), value=float(s.get("cash_in_hand", 0)))
+            minc = c2.number_input("Min Cash", value=float(s.get("min_cash", 0)))
+            maxc = c1.number_input("Max Cash", value=float(s.get("max_cash", 0)))
+            jvno = c2.number_input("Last JV No", value=int(s.get("last_jvno", 0)), step=1)
+            if st.form_submit_button("💾 " + t("save_settings")):
                 upsert_settings(conn, year, start, end, cih, minc, maxc, jvno)
-                st.success("✅ Settings saved")
+                st.success("✅ Settings saved!")
+        st.markdown("</div>", unsafe_allow_html=True)
+
+        # Change password
+        with st.expander("🔑 Change Password"):
+            with st.form("pwd_form"):
+                old_pwd = st.text_input("Current Password", type="password")
+                new_pwd = st.text_input("New Password", type="password")
+                confirm = st.text_input("Confirm New Password", type="password")
+                if st.form_submit_button("🔐 Update Password"):
+                    if new_pwd != confirm:
+                        st.error("Passwords do not match")
+                    elif len(new_pwd) < 6:
+                        st.error("Password must be at least 6 characters")
+                    else:
+                        user = conn.execute("SELECT * FROM app_users WHERE username=?",
+                                            (st.session_state.user,)).fetchone()
+                        if user and bcrypt.checkpw(old_pwd.encode(), user["password_hash"].encode()):
+                            new_hash = bcrypt.hashpw(new_pwd.encode(), bcrypt.gensalt()).decode()
+                            conn.execute("UPDATE app_users SET password_hash=? WHERE username=?",
+                                         (new_hash, st.session_state.user))
+                            conn.commit()
+                            st.success("✅ Password updated!")
+                        else:
+                            st.error("Current password is incorrect")
+
     conn.close()
 
-# ---------------- Initialization ----------------
+# ─────────────────────────────────────────────
+#  Entry point
+# ─────────────────────────────────────────────
 init_db()
+
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
     st.session_state.lang = "en"
 
-if st.session_state.authenticated:
-    main_app()
-else:
+if not st.session_state.authenticated:
+    st.set_page_config(page_title="Madrasa Accounting", page_icon="📚", layout="centered")
+    inject_css()
     login_page()
+else:
+    main_app()
