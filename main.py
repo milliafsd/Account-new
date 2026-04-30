@@ -159,28 +159,295 @@ def t(key):
 def local_css():
     st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
-    html, body, [class*="css"] { font-family: 'Poppins', sans-serif; }
+    @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&family=Noto+Nastaliq+Urdu:wght@400;700&display=swap');
+    
+    /* Global Styles */
+    html, body, [class*="css"] { 
+        font-family: 'Rubik', 'Noto Nastaliq Urdu', sans-serif;
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+    }
+    
+    /* Main Container */
+    .main {
+        background: transparent;
+    }
+    
+    /* Animated Background */
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+    }
+    
+    /* Header Styles */
     .main-header {
-        background: linear-gradient(135deg, #0e695c 0%, #1db89a 100%);
-        padding: 1.8rem 2rem; border-radius: 24px; color: white;
-        margin-bottom: 1.5rem; box-shadow: 0 12px 30px rgba(14,105,92,0.25);
+        background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+        backdrop-filter: blur(10px);
+        padding: 2.5rem 2rem;
+        border-radius: 24px;
+        color: white;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        position: relative;
+        overflow: hidden;
     }
-    .main-header h1 { font-weight: 700; font-size: 2rem; margin: 0; }
+    
+    .main-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, transparent 100%);
+        pointer-events: none;
+    }
+    
+    .main-header h1 { 
+        font-weight: 800;
+        font-size: 3rem;
+        margin: 0;
+        background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .main-header p {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        margin-top: 0.5rem;
+        color: #94a3b8;
+    }
+    
+    /* Sidebar Styles */
+    [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    [data-testid="stSidebar"] h2 {
+        color: #fff;
+        font-weight: 800;
+        font-size: 1.5rem;
+    }
+    
+    /* Button Styles */
     .stButton>button {
-        border-radius: 12px; font-weight: 600;
-        background: linear-gradient(135deg, #0e695c, #0a5548);
-        color: white; border: none; transition: all 0.3s;
+        border-radius: 16px;
+        font-weight: 600;
+        background: linear-gradient(135deg, rgba(168, 85, 247, 0.8) 0%, rgba(124, 58, 237, 0.8) 100%);
+        color: white;
+        border: 1px solid rgba(168, 85, 247, 0.3);
+        transition: all 0.3s ease;
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
     }
+    
     .stButton>button:hover {
-        background: linear-gradient(135deg, #1db89a, #0e695c);
-        box-shadow: 0 8px 20px rgba(14,105,92,0.4); transform: translateY(-2px);
+        background: linear-gradient(135deg, rgba(168, 85, 247, 1) 0%, rgba(124, 58, 237, 1) 100%);
+        box-shadow: 0 8px 25px rgba(168, 85, 247, 0.5);
+        transform: translateY(-2px);
+        border-color: rgba(168, 85, 247, 0.5);
     }
+    
+    /* Sidebar Button Styles */
     .sidebar .stButton>button {
-        background: #f8fafd; color: #162033; border: 1px solid #e0e6ed;
+        background: rgba(30, 41, 59, 0.5);
+        color: #e2e8f0;
+        border: 1px solid rgba(148, 163, 184, 0.3);
+        backdrop-filter: blur(10px);
     }
+    
     .sidebar .stButton>button:hover {
-        background: #eef3fa; color: #0e695c; border-color: #0e695c;
+        background: rgba(168, 85, 247, 0.2);
+        color: #fff;
+        border-color: rgba(168, 85, 247, 0.5);
+        box-shadow: 0 4px 15px rgba(168, 85, 247, 0.2);
+    }
+    
+    /* Input Styles */
+    .stTextInput>div>div>input,
+    .stTextArea>div>div>textarea,
+    .stNumberInput>div>div>input,
+    .stSelectbox>div>div>select,
+    .stDateInput>div>div>input {
+        background: rgba(30, 41, 59, 0.5) !important;
+        border: 1px solid rgba(148, 163, 184, 0.3) !important;
+        border-radius: 12px !important;
+        color: #fff !important;
+        backdrop-filter: blur(10px);
+        padding: 0.75rem 1rem !important;
+        font-size: 0.95rem !important;
+    }
+    
+    .stTextInput>div>div>input:focus,
+    .stTextArea>div>div>textarea:focus,
+    .stNumberInput>div>div>input:focus,
+    .stSelectbox>div>div>select:focus,
+    .stDateInput>div>div>input:focus {
+        border-color: rgba(168, 85, 247, 0.5) !important;
+        box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1) !important;
+    }
+    
+    /* Card Styles */
+    .glass-card {
+        background: rgba(30, 41, 59, 0.4);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 20px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .glass-card:hover {
+        border-color: rgba(168, 85, 247, 0.3);
+        box-shadow: 0 12px 40px rgba(168, 85, 247, 0.2);
+        transform: translateY(-2px);
+    }
+    
+    /* Metric Cards */
+    [data-testid="stMetricValue"] {
+        font-size: 2.5rem !important;
+        font-weight: 800 !important;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        -webkit-background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+        background-clip: text !important;
+    }
+    
+    [data-testid="stMetricLabel"] {
+        color: #94a3b8 !important;
+        font-size: 0.9rem !important;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 600 !important;
+    }
+    
+    /* DataFrame Styles */
+    .stDataFrame {
+        background: rgba(30, 41, 59, 0.4);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 16px;
+        overflow: hidden;
+    }
+    
+    /* Expander Styles */
+    .streamlit-expanderHeader {
+        background: rgba(30, 41, 59, 0.5);
+        border: 1px solid rgba(148, 163, 184, 0.3);
+        border-radius: 12px;
+        color: #e2e8f0 !important;
+        font-weight: 600;
+    }
+    
+    .streamlit-expanderHeader:hover {
+        background: rgba(168, 85, 247, 0.1);
+        border-color: rgba(168, 85, 247, 0.3);
+    }
+    
+    /* File Uploader */
+    [data-testid="stFileUploader"] {
+        background: rgba(30, 41, 59, 0.5);
+        border: 2px dashed rgba(148, 163, 184, 0.3);
+        border-radius: 16px;
+        padding: 2rem;
+    }
+    
+    [data-testid="stFileUploader"]:hover {
+        border-color: rgba(168, 85, 247, 0.5);
+        background: rgba(168, 85, 247, 0.05);
+    }
+    
+    /* Success/Error/Info Messages */
+    .stSuccess {
+        background: rgba(16, 185, 129, 0.1) !important;
+        border: 1px solid rgba(16, 185, 129, 0.3) !important;
+        border-radius: 12px !important;
+        color: #10b981 !important;
+    }
+    
+    .stError {
+        background: rgba(239, 68, 68, 0.1) !important;
+        border: 1px solid rgba(239, 68, 68, 0.3) !important;
+        border-radius: 12px !important;
+        color: #ef4444 !important;
+    }
+    
+    .stInfo {
+        background: rgba(59, 130, 246, 0.1) !important;
+        border: 1px solid rgba(59, 130, 246, 0.3) !important;
+        border-radius: 12px !important;
+        color: #3b82f6 !important;
+    }
+    
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background: rgba(30, 41, 59, 0.5);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: rgba(168, 85, 247, 0.5);
+        border-radius: 5px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background: rgba(168, 85, 247, 0.7);
+    }
+    
+    /* Tab Styles */
+    .stTabs [data-baseweb="tab-list"] {
+        background: rgba(30, 41, 59, 0.5);
+        border-radius: 12px;
+        padding: 0.5rem;
+        gap: 0.5rem;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        border-radius: 8px;
+        color: #94a3b8;
+        font-weight: 600;
+    }
+    
+    .stTabs [aria-selected="true"] {
+        background: linear-gradient(135deg, rgba(168, 85, 247, 0.8), rgba(124, 58, 237, 0.8));
+        color: white !important;
+    }
+    
+    /* Form Styles */
+    [data-testid="stForm"] {
+        background: rgba(30, 41, 59, 0.3);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 20px;
+        padding: 2rem;
+        backdrop-filter: blur(10px);
+    }
+    
+    /* Divider */
+    hr {
+        border: none;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(148, 163, 184, 0.3), transparent);
+        margin: 2rem 0;
+    }
+    
+    /* Login Page */
+    .login-container {
+        background: rgba(30, 41, 59, 0.4);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 24px;
+        padding: 3rem;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
     }
     </style>
     """, unsafe_allow_html=True)
@@ -201,71 +468,20 @@ def ocr_bill(image_bytes):
         text = pytesseract.image_to_string(img, lang='eng+urd')  # if Urdu support needed
     except Exception:
         return None, None, None
-    # رقم تلاش کریں (جیسے 500.00، 1,200 وغیرہ)
     amount = None
     amount_pattern = re.findall(r'(\d{1,3}(?:,\d{2,3})*(?:\.\d{2}))', text)
     if not amount_pattern:
-        amount_pattern = re.findall(r'(\d+(?:\.\d{2}))', text)  # سادہ عدد
+        amount_pattern = re.findall(r'(\d+(?:\.\d{2}))', text)
     if amount_pattern:
-        # سب سے بڑی رقم منتخب کریں (عام طور پر کل رقم)
         amounts = [float(x.replace(',','')) for x in amount_pattern]
         amount = max(amounts)
-    # تاریخ تلاش کریں (UK/PK فارمیٹ)
     date = None
     date_pattern = re.findall(r'(\d{2}/\d{2}/\d{4})', text) or re.findall(r'(\d{4}-\d{2}-\d{2})', text)
     if date_pattern:
         date = date_pattern[0]
-    # تفصیل: پہلی چند لائنیں
     lines = [l.strip() for l in text.split('\n') if l.strip()]
     description = ' '.join(lines[:3]) if lines else text[:100]
     return date, amount, description
-
-# ----------------------- ڈی بی ایف (کوڈ وہی رہے گا) -----------------------
-# (فنکشنز: scan_legacy_years, iterate_dbf, import_accounts_from_dbf, import_entries_from_dbf, وغیرہ)
-def scan_legacy_years(legacy_dir: Path):
-    if not legacy_dir.exists(): return []
-    years = []
-    for item in legacy_dir.iterdir():
-        match = re.compile(r"^JIID(\d{4})\.DBF$", re.IGNORECASE).match(item.name)
-        if match: years.append(match.group(1))
-    return sorted(set(years))
-
-# (باقی تمام DBF فنکشنز وہی رہیں گے، صرف import_control_settings_from_dbf کا اضافہ)
-def import_control_settings_from_dbf(conn, legacy_dir, year):
-    path = legacy_dir / f"JIIC{year}.DBF"
-    if not path.exists(): return
-    for _, row in iterate_dbf(path):
-        if row.get("SDATE") or row.get("EDATE") or row.get("CIH") is not None:
-            conn.execute("""INSERT OR IGNORE INTO control_settings (year, start_date, end_date, cash_in_hand, min_cash, max_cash, last_jvno)
-                            VALUES (?, ?, ?, ?, ?, ?, ?)""",
-                         (year, row.get("SDATE"), row.get("EDATE"), float(row.get("CIH") or 0),
-                          float(row.get("MINCIN") or 0), float(row.get("MAXCIN") or 0), int(row.get("JVNO") or 0)))
-            conn.commit()
-            break
-
-def import_entries_from_dbf(conn, legacy_dir, year):
-    path = legacy_dir / f"JIID{year}.DBF"
-    if not path.exists(): return 0
-    conn.execute("DELETE FROM entries WHERE year = ? AND source_file <> 'MODERN'", (year,))
-    count = 0
-    for row_index, row in iterate_dbf(path):
-        code = str(row.get("CODE") or "").strip().zfill(3)
-        conn.execute("INSERT OR IGNORE INTO accounts (code, name, atype) VALUES (?, '', '')", (code,))
-        conn.execute("""INSERT INTO entries (year, entry_date, jv_no, jv_ext, branch, category, code, description,
-                        receipt_no, voucher_no, entry_kind, income, payment, checked_flag, group_no, source_file, source_row)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                     (year, row.get("DATE"), row.get("JVNO"), row.get("JVEXT"), str(row.get("BRANCH") or "").strip(),
-                      str(row.get("CATEGORY") or "").strip(), code, str(row.get("DESC1") or "").strip(),
-                      row.get("R_NO"), row.get("V_NO"), str(row.get("CJ") or "").strip(),
-                      float(row.get("INCOME") or 0), float(row.get("PAYMENT") or 0),
-                      1 if row.get("CHECKED") else 0, row.get("GROUP"), path.name.upper(), row_index))
-        count += 1
-    conn.commit()
-    return count
-
-def import_year_dbf(conn, legacy_dir, year):
-    import_control_settings_from_dbf(conn, legacy_dir, year)
-    return import_entries_from_dbf(conn, legacy_dir, year)
 
 # ----------------------- بزنس لاجک -----------------------
 def get_years():
@@ -331,7 +547,6 @@ def upsert_entry(conn, payload, entry_id=None, bill_image_bytes=None):
     year = payload.pop("year")
     code = payload.pop("code").zfill(3)
     conn.execute("INSERT OR IGNORE INTO accounts (code) VALUES (?)", (code,))
-    # اگر ایڈوانسڈ فیلڈز نہیں بھیجی گئیں تو ڈیفالٹ
     branch = payload.get("branch", "G")
     category = payload.get("category", "GENERAL")
     vals = (year, payload.get("entry_date"), payload.get("jv_no"), payload.get("jv_ext"),
@@ -351,7 +566,6 @@ def upsert_entry(conn, payload, entry_id=None, bill_image_bytes=None):
                         group_no=? WHERE id=?""", vals + (entry_id,))
         conn.commit()
         new_id = entry_id
-    # بل تصویر محفوظ کریں
     if bill_image_bytes is not None:
         old = conn.execute("SELECT bill_image FROM entries WHERE id=?", (new_id,)).fetchone()
         old_path = old["bill_image"] if old else None
@@ -365,7 +579,7 @@ def upsert_account(conn, code, name, atype):
                  (code.zfill(3), name, atype.upper()))
     conn.commit()
 
-# ----------------------- رپورٹ (پہلے جیسی) -----------------------
+# ----------------------- رپورٹ -----------------------
 def build_report(conn, rtype, year, dfrom, dto):
     if rtype == "ledger":
         rows = fetch_entries(conn, year, date_from=dfrom, date_to=dto, sort_ascending=True)
@@ -398,14 +612,21 @@ def build_report(conn, rtype, year, dfrom, dto):
 
 # ----------------------- لاگ ان -----------------------
 def login_page():
+    st.markdown("""
+    <div style="text-align: center; padding: 2rem 0;">
+        <div style="display: inline-block; padding: 60px 80px; background: rgba(30, 41, 59, 0.4); backdrop-filter: blur(10px); border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 24px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);">
+            <h1 style='color: #fff; font-size: 2.5rem; font-weight: 800; margin-bottom: 0.5rem;'>📚 مدرسہ اکاؤنٹنگ</h1>
+            <p style='color: #94a3b8; font-size: 1rem;'>JAMIA MILLIA ISLAMIA AND MSJID MADRASA WALI</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
     col1, col2, col3 = st.columns([1, 1.5, 1])
     with col2:
-        st.markdown("<h1 style='text-align:center; color:#0e695c;'>📚 " + t("login_title") + "</h1>", unsafe_allow_html=True)
-        st.markdown("<p style='text-align:center; color:#5e6e87;'>JAMIA MILLIA ISLAMIA AND MSJID MADRASA WALI</p>", unsafe_allow_html=True)
         with st.form("login_form"):
             username = st.text_input(t("username"), value="admin")
             password = st.text_input(t("password"), type="password", value="admin123")
-            if st.form_submit_button(t("login_btn")):
+            if st.form_submit_button(t("login_btn"), use_container_width=True):
                 conn = get_connection()
                 user = conn.execute("SELECT * FROM app_users WHERE username=?", (username,)).fetchone()
                 if user and bcrypt.checkpw(password.encode(), user["password_hash"].encode()):
@@ -423,6 +644,7 @@ def login_page():
 def main_app():
     st.set_page_config(page_title="Madrasa Accounting", layout="wide", initial_sidebar_state="expanded")
     local_css()
+    
     if st.session_state.get("lang") == "ur":
         st.markdown('<body dir="rtl">', unsafe_allow_html=True)
 
@@ -430,10 +652,11 @@ def main_app():
     with st.sidebar:
         st.markdown(f"""
         <div style="text-align:center; padding:1rem;">
-            <h2 style="color:#0e695c;">📚 مدرسہ اکاؤنٹس</h2>
-            <p>👤 {st.session_state.get('display_name','')}</p>
+            <h2 style="color:#fff; font-weight: 800;">📚 مدرسہ اکاؤنٹس</h2>
+            <p style="color: #94a3b8;">👤 {st.session_state.get('display_name','')}</p>
         </div>
         """, unsafe_allow_html=True)
+        
         years = get_years()
         yr_list = [y["year"] for y in years]
         if yr_list:
@@ -463,23 +686,7 @@ def main_app():
                 st.session_state.view = vid
 
         st.markdown("---")
-        st.subheader(t("upload_legacy"))
-        uploaded = st.file_uploader("DBF فائلیں", accept_multiple_files=True, type=["dbf","acb","cdx","fpt"])
-        if uploaded and st.button(t("upload_files")):
-            save_dir = Path("uploaded_legacy") / datetime.now().strftime("%Y%m%d_%H%M%S")
-            save_dir.mkdir(parents=True, exist_ok=True)
-            for f in uploaded:
-                with open(save_dir / f.name, "wb") as out:
-                    out.write(f.getbuffer())
-            conn = get_connection()
-            import_accounts_from_dbf(conn, save_dir)
-            for y in scan_legacy_years(save_dir):
-                import_year_dbf(conn, save_dir, y)
-            conn.close()
-            st.success("✅ ڈیٹا امپورٹ ہو گیا")
-            st.rerun()
-
-        if st.button(t("logout")):
+        if st.button(t("logout"), use_container_width=True):
             st.session_state.authenticated = False
             st.rerun()
 
@@ -496,7 +703,6 @@ def main_app():
             col1, col2 = st.columns(2)
             date = col1.date_input(t("date"))
             code = col2.text_input(t("code"), max_chars=3, key="ic")
-            # آٹو ہیڈ
             head = ""
             if code:
                 acc = conn.execute("SELECT name, atype FROM accounts WHERE code=?", (code.zfill(3),)).fetchone()
@@ -504,26 +710,14 @@ def main_app():
             st.text_input(t("account_head"), value=head, disabled=True)
             desc = st.text_area(t("description"))
             amount = st.number_input(t("amount"), min_value=0.0, format="%.2f", key="inc_amt")
-            # بل اپ لوڈ
             bill_file = st.file_uploader(t("bill"), type=["jpg","jpeg","png","pdf"], key="inc_bill")
-            # OCR بٹن
-            if bill_file and st.form_submit_button(t("auto_entry")):
-                date_ocr, amt_ocr, desc_ocr = ocr_bill(bill_file.getvalue())
-                if amt_ocr:
-                    st.session_state.inc_amt = amt_ocr
-                if date_ocr:
-                    try:
-                        st.session_state.inc_date = datetime.strptime(date_ocr, "%d/%m/%Y").date()
-                    except: pass
-                if desc_ocr:
-                    st.session_state.inc_desc = desc_ocr
-                st.experimental_rerun()
-            # ایڈوانسڈ (چھپا ہوا)
+            
             with st.expander(t("advanced")):
                 branch = st.text_input(t("branch"), value="G")
                 category = st.text_input(t("category"), value="GENERAL")
                 receipt_no = st.number_input(t("receipt_no"), value=0, step=1)
                 jv_no = st.number_input(t("jv_no"), value=0, step=1)
+            
             submitted = st.form_submit_button(t("save_income"))
             if submitted:
                 if not code or not date:
@@ -539,7 +733,7 @@ def main_app():
                         st.success("✅ انکم محفوظ ہو گئی")
                     except Exception as e:
                         st.error(str(e))
-        # حالیہ انکم
+        
         st.subheader("📋 حالیہ انکم")
         recent = fetch_entries(conn, year, mode="income", limit=10)
         if recent:
@@ -568,21 +762,13 @@ def main_app():
             desc = st.text_area(t("description"))
             amount = st.number_input(t("amount"), min_value=0.0, format="%.2f", key="exp_amt")
             bill_file = st.file_uploader(t("bill"), type=["jpg","jpeg","png","pdf"], key="exp_bill")
-            if bill_file and st.form_submit_button(t("auto_entry")):
-                date_ocr, amt_ocr, desc_ocr = ocr_bill(bill_file.getvalue())
-                if amt_ocr:
-                    st.session_state.exp_amt = amt_ocr
-                if date_ocr:
-                    try: st.session_state.exp_date = datetime.strptime(date_ocr, "%d/%m/%Y").date()
-                    except: pass
-                if desc_ocr:
-                    st.session_state.exp_desc = desc_ocr
-                st.experimental_rerun()
+            
             with st.expander(t("advanced")):
                 branch = st.text_input(t("branch"), value="G")
                 category = st.text_input(t("category"), value="GENERAL")
                 voucher_no = st.number_input(t("voucher_no"), value=0, step=1)
                 jv_no = st.number_input(t("jv_no"), value=0, step=1)
+            
             submitted = st.form_submit_button(t("save_expense"))
             if submitted:
                 if not code or not date:
@@ -598,7 +784,7 @@ def main_app():
                         st.success("✅ اخراجات محفوظ ہو گئے")
                     except Exception as e:
                         st.error(str(e))
-        # حالیہ اخراجات
+        
         st.subheader("📋 حالیہ اخراجات")
         recent = fetch_entries(conn, year, mode="expense", limit=10)
         if recent:
@@ -667,7 +853,7 @@ def main_app():
                 nc = st.text_input(t("code"), max_chars=3)
                 nn = st.text_input("نام")
                 nt = st.selectbox("ٹائپ", ["","BS","TA","PA"])
-                if st.form_submit_button(t("save_account_head")):
+                if st.form_submit_button("محفوظ کریں"):
                     if nc:
                         upsert_account(conn, nc, nn, nt)
                         st.success("اکاؤنٹ محفوظ ہو گیا")
@@ -701,7 +887,7 @@ def main_app():
             c1, c2 = st.columns(2)
             start = c1.text_input("شروع تاریخ", value=sets["start_date"] or "")
             end = c2.text_input("اختتام تاریخ", value=sets["end_date"] or "")
-            cih = c1.number_input(t("cash_in_hand"), value=float(sets["cash_in_hand"]))
+            cih = c1.number_input("کیش ان ہینڈ", value=float(sets["cash_in_hand"]))
             minc = c2.number_input("کم از کم کیش", value=float(sets["min_cash"]))
             maxc = c1.number_input("زیادہ سے زیادہ کیش", value=float(sets["max_cash"]))
             jvno = c2.number_input("آخری جے وی نمبر", value=int(sets["last_jvno"]))
