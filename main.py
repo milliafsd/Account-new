@@ -102,131 +102,85 @@ def seed_accounts_from_pdf(conn):
         conn.execute("INSERT OR IGNORE INTO accounts (code, name, atype) VALUES (?, ?, ?)", (code, name, atype.strip()))
     conn.commit()
 
-# ----------------------- Translations -----------------------
-I18N = {
-    "en": {
-        "login_title": "Madrasa Accounting System",
-        "username": "Username",
-        "password": "Password",
-        "login_btn": "🔐 Login",
-        "logout": "🚪 Logout",
-        "tab_income": "💰 Income Entry",
-        "tab_expense": "💸 Expense Entry",
-        "tab_reports": "📊 Reports",
-        "tab_ledger": "📒 Ledger",
-        "tab_accounts": "🗂 Accounts",
-        "tab_overview": "📈 Overview",
-        "tab_settings": "⚙ Settings",
-    },
-    "ur": {
-        "login_title": "مدرسہ اکاؤنٹنگ سسٹم",
-        "username": "یوزر نیم",
-        "password": "پاس ورڈ",
-        "login_btn": "🔐 لاگ ان",
-        "logout": "🚪 لاگ آؤٹ",
-        "tab_income": "💰 انکم انٹری",
-        "tab_expense": "💸 پیمنٹس انٹری",
-        "tab_reports": "📊 رپورٹس",
-        "tab_ledger": "📒 لیجر",
-        "tab_accounts": "🗂 اکاؤنٹس",
-        "tab_overview": "📈 جائزہ",
-        "tab_settings": "⚙ سیٹنگز",
-    },
-}
-
-def t(key):
-    return I18N.get(st.session_state.get("lang", "en"), I18N["en"]).get(key, key)
-
-# ----------------------- Modern Styling -----------------------
-def apply_modern_css():
+# ----------------------- Ultra Modern Styling -----------------------
+def apply_ultra_modern_css():
     st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Nastaliq+Urdu:wght@400;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Noto+Nastaliq+Urdu:wght@400;700&display=swap');
     
-    /* ========= GLOBAL STYLES ========= */
+    /* ========= RESET & BASE ========= */
     * {
-        font-family: 'Inter', 'Noto Nastaliq Urdu', sans-serif !important;
+        font-family: 'Poppins', 'Noto Nastaliq Urdu', sans-serif !important;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
     }
     
+    /* ========= APP BACKGROUND ========= */
     .stApp {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        background-attachment: fixed;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     }
     
     .main {
         background: transparent;
+        padding: 2rem;
     }
     
-    /* ========= SIDEBAR STYLES ========= */
+    /* ========= SIDEBAR - WHITE & CLEAN ========= */
     [data-testid="stSidebar"] {
-        background: rgba(255, 255, 255, 0.95) !important;
-        backdrop-filter: blur(20px);
-        border-right: none !important;
-        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.1);
+        background: #ffffff !important;
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
+        border-right: 1px solid #e8ecf4 !important;
     }
     
     [data-testid="stSidebar"] * {
-        color: #1a1a2e !important;
+        color: #2d3748 !important;
     }
     
-    /* ========= BEAUTIFUL BUTTON STYLES ========= */
+    /* ========= MODERN CARD BUTTONS ========= */
     .stButton > button {
-        width: 100%;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
         color: white !important;
         border: none !important;
-        border-radius: 20px !important;
-        padding: 18px 24px !important;
-        font-size: 16px !important;
-        font-weight: 700 !important;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4) !important;
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .stButton > button::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
+        border-radius: 16px !important;
+        padding: 16px 28px !important;
+        font-size: 15px !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.3px !important;
+        box-shadow: 0 10px 25px -5px rgba(102, 126, 234, 0.4) !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
         width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-        transition: left 0.5s;
-    }
-    
-    .stButton > button:hover::before {
-        left: 100%;
+        text-align: left !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 12px !important;
     }
     
     .stButton > button:hover {
-        transform: translateY(-4px) scale(1.02) !important;
-        box-shadow: 0 12px 32px rgba(102, 126, 234, 0.6) !important;
+        transform: translateY(-3px) !important;
+        box-shadow: 0 15px 35px -5px rgba(102, 126, 234, 0.5) !important;
         background: linear-gradient(135deg, #764ba2 0%, #667eea 100%) !important;
     }
     
     .stButton > button:active {
-        transform: translateY(-2px) scale(0.98) !important;
+        transform: translateY(-1px) !important;
     }
     
-    /* ========= INPUT FIELDS ========= */
+    /* ========= CLEAN INPUT FIELDS ========= */
     .stTextInput > div > div > input,
     .stTextArea > div > div > textarea,
     .stNumberInput > div > div > input,
     .stSelectbox > div > div > select,
     .stDateInput > div > div > input {
-        background: rgba(255, 255, 255, 0.95) !important;
-        border: 2px solid #e0e7ff !important;
-        border-radius: 16px !important;
-        color: #1a1a2e !important;
-        padding: 16px 20px !important;
-        font-size: 16px !important;
+        background: #ffffff !important;
+        border: 2px solid #e8ecf4 !important;
+        border-radius: 12px !important;
+        color: #2d3748 !important;
+        padding: 14px 18px !important;
+        font-size: 15px !important;
         font-weight: 500 !important;
-        transition: all 0.3s ease !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+        transition: all 0.25s ease !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
     }
     
     .stTextInput > div > div > input:focus,
@@ -235,154 +189,193 @@ def apply_modern_css():
     .stSelectbox > div > div > select:focus,
     .stDateInput > div > div > input:focus {
         border-color: #667eea !important;
-        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1), 0 8px 20px rgba(0, 0, 0, 0.1) !important;
-        transform: translateY(-2px) !important;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1), 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+        outline: none !important;
     }
     
     /* ========= LABELS ========= */
     label {
-        color: #1a1a2e !important;
-        font-weight: 700 !important;
-        font-size: 14px !important;
+        color: #4a5568 !important;
+        font-weight: 600 !important;
+        font-size: 13px !important;
         text-transform: uppercase;
         letter-spacing: 0.5px;
         margin-bottom: 8px !important;
     }
     
-    /* ========= CARDS & CONTAINERS ========= */
+    /* ========= WHITE CARD CONTAINERS ========= */
     [data-testid="stForm"] {
-        background: rgba(255, 255, 255, 0.95) !important;
-        border: none !important;
-        border-radius: 24px !important;
+        background: #ffffff !important;
+        border: 1px solid #e8ecf4 !important;
+        border-radius: 20px !important;
         padding: 32px !important;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15) !important;
-        backdrop-filter: blur(20px);
+        box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.1) !important;
     }
     
-    /* ========= METRICS ========= */
+    /* ========= STATS CARDS ========= */
     [data-testid="stMetricValue"] {
-        font-size: 3rem !important;
-        font-weight: 900 !important;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        -webkit-background-clip: text !important;
-        -webkit-text-fill-color: transparent !important;
-        background-clip: text !important;
+        font-size: 2.5rem !important;
+        font-weight: 800 !important;
+        color: #2d3748 !important;
     }
     
     [data-testid="stMetricLabel"] {
-        color: #1a1a2e !important;
-        font-size: 14px !important;
+        color: #718096 !important;
+        font-size: 13px !important;
         text-transform: uppercase;
-        letter-spacing: 1px;
-        font-weight: 700 !important;
+        letter-spacing: 0.8px;
+        font-weight: 600 !important;
     }
     
-    /* ========= MESSAGES ========= */
+    /* ========= COLORFUL ALERTS ========= */
     .stSuccess {
-        background: linear-gradient(135deg, #00f2c3 0%, #0098f0 100%) !important;
+        background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%) !important;
         color: white !important;
         border: none !important;
-        border-radius: 16px !important;
+        border-radius: 14px !important;
         padding: 16px 24px !important;
         font-weight: 600 !important;
-        box-shadow: 0 8px 24px rgba(0, 242, 195, 0.3) !important;
+        box-shadow: 0 8px 20px rgba(86, 171, 47, 0.3) !important;
     }
     
     .stError {
-        background: linear-gradient(135deg, #f857a6 0%, #ff5858 100%) !important;
+        background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%) !important;
         color: white !important;
         border: none !important;
-        border-radius: 16px !important;
+        border-radius: 14px !important;
         padding: 16px 24px !important;
         font-weight: 600 !important;
-        box-shadow: 0 8px 24px rgba(255, 88, 88, 0.3) !important;
+        box-shadow: 0 8px 20px rgba(235, 51, 73, 0.3) !important;
     }
     
     .stInfo {
-        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%) !important;
-        color: #1a1a2e !important;
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+        color: white !important;
         border: none !important;
-        border-radius: 16px !important;
+        border-radius: 14px !important;
         padding: 16px 24px !important;
         font-weight: 600 !important;
-        box-shadow: 0 8px 24px rgba(168, 237, 234, 0.3) !important;
+        box-shadow: 0 8px 20px rgba(79, 172, 254, 0.3) !important;
     }
     
     /* ========= DATAFRAMES ========= */
     .stDataFrame {
-        background: rgba(255, 255, 255, 0.95) !important;
-        border: none !important;
-        border-radius: 20px !important;
+        background: #ffffff !important;
+        border: 1px solid #e8ecf4 !important;
+        border-radius: 16px !important;
         overflow: hidden;
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1) !important;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08) !important;
     }
     
     /* ========= HEADERS ========= */
-    h1, h2, h3 {
-        color: white !important;
-        font-weight: 900 !important;
-        text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    h1 {
+        color: #2d3748 !important;
+        font-weight: 800 !important;
+        font-size: 2.5rem !important;
+        letter-spacing: -0.5px;
     }
     
-    /* ========= DIVIDERS ========= */
-    hr {
-        border: none;
-        height: 2px;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-        margin: 24px 0;
+    h2 {
+        color: #2d3748 !important;
+        font-weight: 700 !important;
+        font-size: 1.8rem !important;
+    }
+    
+    h3 {
+        color: #4a5568 !important;
+        font-weight: 600 !important;
+        font-size: 1.3rem !important;
+    }
+    
+    /* ========= MODERN ENTRY CARDS ========= */
+    .modern-entry-card {
+        background: #ffffff;
+        border: 1px solid #e8ecf4;
+        border-radius: 16px;
+        padding: 20px 24px;
+        margin-bottom: 14px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        transition: all 0.25s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .modern-entry-card::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .modern-entry-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        border-color: #667eea;
+    }
+    
+    /* ========= STAT CARD CONTAINERS ========= */
+    .stat-card {
+        background: #ffffff;
+        border: 1px solid #e8ecf4;
+        border-radius: 20px;
+        padding: 28px;
+        text-align: center;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 45px rgba(0, 0, 0, 0.12);
+    }
+    
+    .stat-icon {
+        font-size: 3rem;
+        margin-bottom: 12px;
+    }
+    
+    .stat-value {
+        font-size: 2.2rem;
+        font-weight: 800;
+        margin: 8px 0;
+    }
+    
+    .stat-label {
+        color: #718096;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 600;
     }
     
     /* ========= SCROLLBAR ========= */
     ::-webkit-scrollbar {
-        width: 12px;
-        height: 12px;
+        width: 10px;
+        height: 10px;
     }
     
     ::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 10px;
+        background: #f7fafc;
     }
     
     ::-webkit-scrollbar-thumb {
         background: linear-gradient(135deg, #667eea, #764ba2);
-        border-radius: 10px;
+        border-radius: 5px;
     }
     
     ::-webkit-scrollbar-thumb:hover {
         background: linear-gradient(135deg, #764ba2, #667eea);
     }
     
-    /* ========= EXPANDER ========= */
-    .streamlit-expanderHeader {
-        background: rgba(255, 255, 255, 0.95) !important;
-        border: 2px solid #e0e7ff !important;
-        border-radius: 16px !important;
-        color: #1a1a2e !important;
-        font-weight: 700 !important;
-        padding: 16px 24px !important;
-        transition: all 0.3s ease !important;
-    }
-    
-    .streamlit-expanderHeader:hover {
-        background: white !important;
-        border-color: #667eea !important;
-        box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2) !important;
-    }
-    
-    /* ========= ENTRY CARDS ========= */
-    .entry-card {
-        background: rgba(255, 255, 255, 0.95);
-        border-radius: 20px;
-        padding: 20px;
-        margin-bottom: 16px;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
-        border-left: 5px solid #667eea;
-    }
-    
-    .entry-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+    /* ========= DIVIDERS ========= */
+    hr {
+        border: none;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #e8ecf4, transparent);
+        margin: 28px 0;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -390,27 +383,25 @@ def apply_modern_css():
 def page_header(title, subtitle="", emoji="📚"):
     st.markdown(f"""
     <div style="
-        background: rgba(255, 255, 255, 0.15);
-        backdrop-filter: blur(20px);
+        background: #ffffff;
+        border: 1px solid #e8ecf4;
         padding: 40px;
-        border-radius: 30px;
+        border-radius: 24px;
         margin-bottom: 32px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
         text-align: center;
     ">
         <div style="font-size: 4rem; margin-bottom: 16px;">{emoji}</div>
         <h1 style="
-            font-size: 3rem;
-            font-weight: 900;
+            font-size: 2.5rem;
+            font-weight: 800;
             margin: 0;
-            color: white;
-            text-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-            letter-spacing: -1px;
+            color: #2d3748;
+            letter-spacing: -0.5px;
         ">{title}</h1>
         <p style="
-            font-size: 1.2rem;
-            color: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+            color: #718096;
             margin: 12px 0 0 0;
             font-weight: 500;
         ">{subtitle}</p>
@@ -501,36 +492,38 @@ def save_entry(conn, year, date, code, description, amount, entry_type):
 
 # ----------------------- Login Page -----------------------
 def login_page():
-    apply_modern_css()
+    apply_ultra_modern_css()
     
     st.markdown("""
     <div style="
         display: flex;
         justify-content: center;
         align-items: center;
-        min-height: 80vh;
+        min-height: 85vh;
     ">
         <div style="
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 60px;
-            border-radius: 30px;
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.3);
-            max-width: 500px;
+            background: #ffffff;
+            padding: 60px 50px;
+            border-radius: 28px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            max-width: 450px;
             width: 100%;
             text-align: center;
+            border: 1px solid #e8ecf4;
         ">
             <div style="font-size: 5rem; margin-bottom: 24px;">📚</div>
             <h1 style="
-                font-size: 2.5rem;
-                font-weight: 900;
-                color: #1a1a2e;
-                margin-bottom: 12px;
+                font-size: 2.2rem;
+                font-weight: 800;
+                color: #2d3748;
+                margin-bottom: 8px;
+                letter-spacing: -0.5px;
             ">مدرسہ اکاؤنٹنگ</h1>
             <p style="
-                font-size: 1.1rem;
-                color: #666;
+                font-size: 0.95rem;
+                color: #718096;
                 margin-bottom: 40px;
+                font-weight: 500;
             ">JAMIA MILLIA ISLAMIA & MASJID MADRASA WALI</p>
         </div>
     </div>
@@ -539,8 +532,10 @@ def login_page():
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         with st.form("login_form"):
-            username = st.text_input("👤 " + t("username"), value="admin")
-            password = st.text_input("🔒 " + t("password"), type="password", value="admin123")
+            username = st.text_input("👤 یوزر نیم", value="admin", placeholder="یوزر نیم درج کریں")
+            password = st.text_input("🔒 پاس ورڈ", type="password", value="admin123", placeholder="پاس ورڈ درج کریں")
+            
+            st.markdown("<br>", unsafe_allow_html=True)
             
             if st.form_submit_button("🔐 لاگ ان کریں", use_container_width=True):
                 conn = get_connection()
@@ -566,20 +561,20 @@ def main_app():
         initial_sidebar_state="expanded"
     )
     
-    apply_modern_css()
+    apply_ultra_modern_css()
     
     # Sidebar
     with st.sidebar:
         st.markdown("""
-        <div style="text-align: center; padding: 32px 0; margin-bottom: 24px;">
-            <div style="font-size: 4rem; margin-bottom: 16px;">📚</div>
-            <h2 style="font-size: 1.8rem; margin: 0; font-weight: 900;">مدرسہ اکاؤنٹس</h2>
-            <p style="color: #666; margin: 8px 0 0 0; font-weight: 600;">👤 {}</p>
+        <div style="text-align: center; padding: 32px 0 28px 0;">
+            <div style="font-size: 3.5rem; margin-bottom: 16px;">📚</div>
+            <h2 style="font-size: 1.6rem; margin: 0; font-weight: 800; color: #2d3748;">مدرسہ اکاؤنٹس</h2>
+            <p style="color: #718096; margin: 8px 0 0 0; font-weight: 600; font-size: 0.9rem;">👤 {}</p>
         </div>
         """.format(st.session_state.get('display_name', '')), unsafe_allow_html=True)
         
         years = get_years()
-        year = st.selectbox("📅 سال منتخب کریں", years, index=0)
+        year = st.selectbox("📅 سال", years, index=0)
         st.session_state.year = year
         
         st.markdown("<br>", unsafe_allow_html=True)
@@ -589,26 +584,26 @@ def main_app():
         selected_lang = st.radio("🌐 زبان", lang_options, index=lang_idx)
         st.session_state.lang = "en" if selected_lang.startswith("🇬🇧") else "ur"
         
-        st.markdown("<br><br>", unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True)
         
-        if st.button("💰 انکم انٹری", key="btn_income"):
+        if st.button("💰 انکم انٹری"):
             st.session_state.view = "income"
         
-        if st.button("💸 خرچ انٹری", key="btn_expense"):
+        if st.button("💸 خرچ انٹری"):
             st.session_state.view = "expense"
         
-        if st.button("📈 مالی جائزہ", key="btn_overview"):
+        if st.button("📈 مالی جائزہ"):
             st.session_state.view = "overview"
         
-        if st.button("📒 لیجر", key="btn_ledger"):
+        if st.button("📒 لیجر"):
             st.session_state.view = "ledger"
         
-        if st.button("🗂 اکاؤنٹس", key="btn_accounts"):
+        if st.button("🗂 اکاؤنٹس"):
             st.session_state.view = "accounts"
         
         st.markdown("<br><br>", unsafe_allow_html=True)
         
-        if st.button("🚪 لاگ آؤٹ", key="btn_logout"):
+        if st.button("🚪 لاگ آؤٹ"):
             st.session_state.clear()
             st.rerun()
     
@@ -631,7 +626,6 @@ def main_app():
             date = col1.date_input("📆 تاریخ", value=datetime.now())
             code = col2.text_input("🔢 اکاؤنٹ کوڈ", max_chars=3, placeholder="001")
             
-            # Auto-populate account name
             account_name = ""
             if code:
                 acc = conn.execute("SELECT name FROM accounts WHERE code=?", (code.zfill(3),)).fetchone()
@@ -639,7 +633,7 @@ def main_app():
             
             st.text_input("🏦 اکاؤنٹ کا نام", value=account_name, disabled=True)
             
-            description = st.text_area("📄 تفصیل", placeholder="مکمل تفصیل یہاں لکھیں...")
+            description = st.text_area("📄 تفصیل", placeholder="مکمل تفصیل یہاں لکھیں...", height=100)
             amount = st.number_input("💵 رقم (PKR)", min_value=0.0, step=100.0, format="%.2f")
             
             st.markdown("<br>", unsafe_allow_html=True)
@@ -659,22 +653,23 @@ def main_app():
                     st.error("⚠ کوڈ اور رقم ضروری ہیں")
         
         st.markdown("<br><br>", unsafe_allow_html=True)
-        st.markdown("### 📋 حالیہ انکم انٹریز")
+        st.markdown("<h3 style='color: #2d3748; font-weight: 700;'>📋 حالیہ انکم انٹریز</h3>", unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True)
         
         recent = fetch_entries(conn, year, mode="income", limit=10)
         if recent:
             for entry in recent:
                 st.markdown(f"""
-                <div class="entry-card">
+                <div class="modern-entry-card">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <div style="font-size: 0.9rem; color: #666; margin-bottom: 4px;">📅 {entry['entry_date']}</div>
-                            <div style="font-size: 1.1rem; font-weight: 700; color: #1a1a2e;">🔢 {entry['code']} - {entry['account_name']}</div>
-                            <div style="font-size: 0.95rem; color: #666; margin-top: 4px;">📄 {entry['description'][:60]}</div>
+                        <div style="flex: 1;">
+                            <div style="font-size: 0.85rem; color: #718096; margin-bottom: 6px; font-weight: 600;">📅 {entry['entry_date']}</div>
+                            <div style="font-size: 1.05rem; font-weight: 700; color: #2d3748; margin-bottom: 6px;">🔢 {entry['code']} • {entry['account_name']}</div>
+                            <div style="font-size: 0.9rem; color: #4a5568;">📄 {entry['description'][:70]}</div>
                         </div>
-                        <div style="text-align: right;">
-                            <div style="font-size: 1.8rem; font-weight: 900; color: #667eea;">💰 {entry['income']:,.0f}</div>
-                            <div style="font-size: 0.9rem; color: #666;">PKR</div>
+                        <div style="text-align: right; min-width: 140px;">
+                            <div style="font-size: 1.8rem; font-weight: 800; color: #667eea;">₨ {entry['income']:,.0f}</div>
+                            <div style="font-size: 0.85rem; color: #718096; font-weight: 600;">PKR</div>
                         </div>
                     </div>
                 </div>
@@ -699,7 +694,7 @@ def main_app():
             
             st.text_input("🏦 اکاؤنٹ کا نام", value=account_name, disabled=True)
             
-            description = st.text_area("📄 تفصیل", placeholder="مکمل تفصیل یہاں لکھیں...")
+            description = st.text_area("📄 تفصیل", placeholder="مکمل تفصیل یہاں لکھیں...", height=100)
             amount = st.number_input("💵 رقم (PKR)", min_value=0.0, step=100.0, format="%.2f")
             
             st.markdown("<br>", unsafe_allow_html=True)
@@ -719,22 +714,23 @@ def main_app():
                     st.error("⚠ کوڈ اور رقم ضروری ہیں")
         
         st.markdown("<br><br>", unsafe_allow_html=True)
-        st.markdown("### 📋 حالیہ خرچ انٹریز")
+        st.markdown("<h3 style='color: #2d3748; font-weight: 700;'>📋 حالیہ خرچ انٹریز</h3>", unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True)
         
         recent = fetch_entries(conn, year, mode="expense", limit=10)
         if recent:
             for entry in recent:
                 st.markdown(f"""
-                <div class="entry-card" style="border-left-color: #f857a6;">
+                <div class="modern-entry-card">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <div style="font-size: 0.9rem; color: #666; margin-bottom: 4px;">📅 {entry['entry_date']}</div>
-                            <div style="font-size: 1.1rem; font-weight: 700; color: #1a1a2e;">🔢 {entry['code']} - {entry['account_name']}</div>
-                            <div style="font-size: 0.95rem; color: #666; margin-top: 4px;">📄 {entry['description'][:60]}</div>
+                        <div style="flex: 1;">
+                            <div style="font-size: 0.85rem; color: #718096; margin-bottom: 6px; font-weight: 600;">📅 {entry['entry_date']}</div>
+                            <div style="font-size: 1.05rem; font-weight: 700; color: #2d3748; margin-bottom: 6px;">🔢 {entry['code']} • {entry['account_name']}</div>
+                            <div style="font-size: 0.9rem; color: #4a5568;">📄 {entry['description'][:70]}</div>
                         </div>
-                        <div style="text-align: right;">
-                            <div style="font-size: 1.8rem; font-weight: 900; color: #f857a6;">💸 {entry['payment']:,.0f}</div>
-                            <div style="font-size: 0.9rem; color: #666;">PKR</div>
+                        <div style="text-align: right; min-width: 140px;">
+                            <div style="font-size: 1.8rem; font-weight: 800; color: #eb3349;">₨ {entry['payment']:,.0f}</div>
+                            <div style="font-size: 0.85rem; color: #718096; font-weight: 600;">PKR</div>
                         </div>
                     </div>
                 </div>
@@ -751,64 +747,48 @@ def main_app():
         col1, col2, col3 = st.columns(3)
         
         with col1:
-            st.markdown("""
-            <div style="
-                background: rgba(255, 255, 255, 0.95);
-                border-radius: 24px;
-                padding: 32px;
-                text-align: center;
-                box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
-            ">
-                <div style="font-size: 3rem; margin-bottom: 12px;">💰</div>
-                <div style="font-size: 0.9rem; color: #666; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">کل آمدنی</div>
-                <div style="font-size: 2.5rem; font-weight: 900; background: linear-gradient(135deg, #00f2c3, #0098f0); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">{:,.0f}</div>
-                <div style="font-size: 1rem; color: #666; margin-top: 4px;">PKR</div>
+            st.markdown(f"""
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-label">کل آمدنی</div>
+                <div class="stat-value" style="color: #667eea;">₨ {dash['summary']['total_income']:,.0f}</div>
+                <div style="font-size: 0.9rem; color: #718096; margin-top: 4px;">PKR</div>
             </div>
-            """.format(dash['summary']['total_income']), unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
         
         with col2:
-            st.markdown("""
-            <div style="
-                background: rgba(255, 255, 255, 0.95);
-                border-radius: 24px;
-                padding: 32px;
-                text-align: center;
-                box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
-            ">
-                <div style="font-size: 3rem; margin-bottom: 12px;">💸</div>
-                <div style="font-size: 0.9rem; color: #666; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">کل اخراجات</div>
-                <div style="font-size: 2.5rem; font-weight: 900; background: linear-gradient(135deg, #f857a6, #ff5858); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">{:,.0f}</div>
-                <div style="font-size: 1rem; color: #666; margin-top: 4px;">PKR</div>
+            st.markdown(f"""
+            <div class="stat-card">
+                <div class="stat-icon">💸</div>
+                <div class="stat-label">کل اخراجات</div>
+                <div class="stat-value" style="color: #eb3349;">₨ {dash['summary']['total_payment']:,.0f}</div>
+                <div style="font-size: 0.9rem; color: #718096; margin-top: 4px;">PKR</div>
             </div>
-            """.format(dash['summary']['total_payment']), unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
         
         with col3:
             balance = dash['summary']['balance']
-            balance_color = "#00f2c3" if balance > 0 else "#ff5858"
+            balance_color = "#56ab2f" if balance > 0 else "#eb3349"
             st.markdown(f"""
-            <div style="
-                background: rgba(255, 255, 255, 0.95);
-                border-radius: 24px;
-                padding: 32px;
-                text-align: center;
-                box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
-            ">
-                <div style="font-size: 3rem; margin-bottom: 12px;">⚖️</div>
-                <div style="font-size: 0.9rem; color: #666; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">خالص بیلنس</div>
-                <div style="font-size: 2.5rem; font-weight: 900; color: {balance_color};">{balance:,.0f}</div>
-                <div style="font-size: 1rem; color: #666; margin-top: 4px;">PKR</div>
+            <div class="stat-card">
+                <div class="stat-icon">⚖️</div>
+                <div class="stat-label">خالص بیلنس</div>
+                <div class="stat-value" style="color: {balance_color};">₨ {balance:,.0f}</div>
+                <div style="font-size: 0.9rem; color: #718096; margin-top: 4px;">PKR</div>
             </div>
             """, unsafe_allow_html=True)
         
         if dash['monthly']:
             st.markdown("<br><br>", unsafe_allow_html=True)
-            st.markdown("### 📊 ماہانہ رپورٹ")
+            st.markdown("<h3 style='color: #2d3748; font-weight: 700;'>📊 ماہانہ رپورٹ</h3>", unsafe_allow_html=True)
+            st.markdown("<br>", unsafe_allow_html=True)
             df = pd.DataFrame(dash['monthly'])
             st.bar_chart(df.set_index('month')[['income', 'payment']])
         
         if dash['top_accounts']:
             st.markdown("<br><br>", unsafe_allow_html=True)
-            st.markdown("### 🏆 اہم اکاؤنٹس")
+            st.markdown("<h3 style='color: #2d3748; font-weight: 700;'>🏆 اہم اکاؤنٹس</h3>", unsafe_allow_html=True)
+            st.markdown("<br>", unsafe_allow_html=True)
             df = pd.DataFrame(dash['top_accounts'])
             st.dataframe(df, use_container_width=True, height=400)
     
@@ -825,9 +805,9 @@ def main_app():
                     "📅 تاریخ": e['entry_date'],
                     "🔢 کوڈ": e['code'],
                     "🏦 اکاؤنٹ": e['account_name'],
-                    "📄 تفصیل": e['description'][:50],
-                    "💰 آمدنی": f"{e['income']:,.0f}" if e['income'] > 0 else "-",
-                    "💸 اخراجات": f"{e['payment']:,.0f}" if e['payment'] > 0 else "-"
+                    "📄 تفصیل": e['description'][:60],
+                    "💰 آمدنی": f"₨ {e['income']:,.0f}" if e['income'] > 0 else "-",
+                    "💸 اخراجات": f"₨ {e['payment']:,.0f}" if e['payment'] > 0 else "-"
                 })
             
             df = pd.DataFrame(data)
