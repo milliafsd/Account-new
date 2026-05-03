@@ -4,7 +4,8 @@ import bcrypt
 from pathlib import Path
 from datetime import datetime
 import pandas as pd
-import os
+import plotly.express as px
+import plotly.graph_objects as go
 
 # ----------------------- Configuration -----------------------
 DB_PATH = Path(__file__).parent / "madrasa_modern.sqlite3"
@@ -102,85 +103,118 @@ def seed_accounts_from_pdf(conn):
         conn.execute("INSERT OR IGNORE INTO accounts (code, name, atype) VALUES (?, ?, ?)", (code, name, atype.strip()))
     conn.commit()
 
-# ----------------------- Ultra Modern Styling -----------------------
-def apply_ultra_modern_css():
+# ----------------------- Perfect Modern Design -----------------------
+def apply_perfect_design():
     st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Noto+Nastaliq+Urdu:wght@400;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Nastaliq+Urdu:wght@400;700&display=swap');
     
-    /* ========= RESET & BASE ========= */
+    /* ========= ROOT VARIABLES ========= */
+    :root {
+        --primary: #6366f1;
+        --primary-dark: #4f46e5;
+        --success: #10b981;
+        --danger: #ef4444;
+        --warning: #f59e0b;
+        --info: #3b82f6;
+        --bg-light: #f8fafc;
+        --bg-white: #ffffff;
+        --text-dark: #0f172a;
+        --text-gray: #64748b;
+        --border: #e2e8f0;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+    }
+    
+    /* ========= GLOBAL RESET ========= */
     * {
-        font-family: 'Poppins', 'Noto Nastaliq Urdu', sans-serif !important;
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
+        font-family: 'Inter', 'Noto Nastaliq Urdu', -apple-system, BlinkMacSystemFont, sans-serif !important;
+        letter-spacing: -0.01em;
     }
     
     /* ========= APP BACKGROUND ========= */
     .stApp {
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        background: var(--bg-light);
     }
     
     .main {
-        background: transparent;
-        padding: 2rem;
+        padding: 1.5rem !important;
     }
     
-    /* ========= SIDEBAR - WHITE & CLEAN ========= */
+    /* ========= SIDEBAR ========= */
     [data-testid="stSidebar"] {
-        background: #ffffff !important;
-        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
-        border-right: 1px solid #e8ecf4 !important;
+        background: var(--bg-white) !important;
+        border-right: 1px solid var(--border) !important;
+        box-shadow: var(--shadow) !important;
     }
     
-    [data-testid="stSidebar"] * {
-        color: #2d3748 !important;
+    [data-testid="stSidebar"] > div:first-child {
+        padding: 2rem 1.5rem !important;
     }
     
-    /* ========= MODERN CARD BUTTONS ========= */
+    /* ========= BUTTONS ========= */
     .stButton > button {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-        color: white !important;
-        border: none !important;
-        border-radius: 16px !important;
-        padding: 16px 28px !important;
-        font-size: 15px !important;
-        font-weight: 600 !important;
-        letter-spacing: 0.3px !important;
-        box-shadow: 0 10px 25px -5px rgba(102, 126, 234, 0.4) !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
         width: 100%;
+        background: var(--bg-white) !important;
+        color: var(--text-dark) !important;
+        border: 1.5px solid var(--border) !important;
+        border-radius: 12px !important;
+        padding: 14px 20px !important;
+        font-size: 14px !important;
+        font-weight: 600 !important;
+        transition: all 0.2s ease !important;
+        box-shadow: var(--shadow-sm) !important;
         text-align: left !important;
         display: flex !important;
         align-items: center !important;
-        gap: 12px !important;
+        gap: 10px !important;
     }
     
     .stButton > button:hover {
-        transform: translateY(-3px) !important;
-        box-shadow: 0 15px 35px -5px rgba(102, 126, 234, 0.5) !important;
-        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%) !important;
-    }
-    
-    .stButton > button:active {
+        background: var(--primary) !important;
+        color: white !important;
+        border-color: var(--primary) !important;
+        box-shadow: var(--shadow) !important;
         transform: translateY(-1px) !important;
     }
     
-    /* ========= CLEAN INPUT FIELDS ========= */
+    .stButton > button:active {
+        transform: translateY(0) !important;
+    }
+    
+    /* ========= PRIMARY BUTTON ========= */
+    .stButton > button[kind="primary"],
+    div[data-testid="stForm"] .stButton > button {
+        background: var(--primary) !important;
+        color: white !important;
+        border-color: var(--primary) !important;
+        box-shadow: var(--shadow) !important;
+    }
+    
+    .stButton > button[kind="primary"]:hover,
+    div[data-testid="stForm"] .stButton > button:hover {
+        background: var(--primary-dark) !important;
+        border-color: var(--primary-dark) !important;
+        box-shadow: var(--shadow-lg) !important;
+    }
+    
+    /* ========= INPUT FIELDS ========= */
     .stTextInput > div > div > input,
     .stTextArea > div > div > textarea,
     .stNumberInput > div > div > input,
     .stSelectbox > div > div > select,
     .stDateInput > div > div > input {
-        background: #ffffff !important;
-        border: 2px solid #e8ecf4 !important;
-        border-radius: 12px !important;
-        color: #2d3748 !important;
-        padding: 14px 18px !important;
-        font-size: 15px !important;
+        background: var(--bg-white) !important;
+        border: 1.5px solid var(--border) !important;
+        border-radius: 10px !important;
+        color: var(--text-dark) !important;
+        padding: 12px 16px !important;
+        font-size: 14px !important;
         font-weight: 500 !important;
-        transition: all 0.25s ease !important;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+        transition: all 0.2s ease !important;
+        box-shadow: var(--shadow-sm) !important;
     }
     
     .stTextInput > div > div > input:focus,
@@ -188,221 +222,280 @@ def apply_ultra_modern_css():
     .stNumberInput > div > div > input:focus,
     .stSelectbox > div > div > select:focus,
     .stDateInput > div > div > input:focus {
-        border-color: #667eea !important;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1), 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+        border-color: var(--primary) !important;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
         outline: none !important;
+    }
+    
+    .stTextInput > div > div > input::placeholder,
+    .stTextArea > div > div > textarea::placeholder {
+        color: var(--text-gray) !important;
+        opacity: 0.6;
     }
     
     /* ========= LABELS ========= */
     label {
-        color: #4a5568 !important;
+        color: var(--text-dark) !important;
         font-weight: 600 !important;
         font-size: 13px !important;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 8px !important;
+        margin-bottom: 6px !important;
+        display: block !important;
     }
     
-    /* ========= WHITE CARD CONTAINERS ========= */
+    /* ========= FORMS ========= */
     [data-testid="stForm"] {
-        background: #ffffff !important;
-        border: 1px solid #e8ecf4 !important;
-        border-radius: 20px !important;
-        padding: 32px !important;
-        box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.1) !important;
+        background: var(--bg-white) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 16px !important;
+        padding: 28px !important;
+        box-shadow: var(--shadow) !important;
     }
     
-    /* ========= STATS CARDS ========= */
+    /* ========= METRICS ========= */
+    [data-testid="stMetric"] {
+        background: var(--bg-white) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 16px !important;
+        padding: 24px !important;
+        box-shadow: var(--shadow) !important;
+    }
+    
     [data-testid="stMetricValue"] {
-        font-size: 2.5rem !important;
+        font-size: 32px !important;
         font-weight: 800 !important;
-        color: #2d3748 !important;
+        color: var(--text-dark) !important;
     }
     
     [data-testid="stMetricLabel"] {
-        color: #718096 !important;
-        font-size: 13px !important;
-        text-transform: uppercase;
-        letter-spacing: 0.8px;
+        color: var(--text-gray) !important;
+        font-size: 12px !important;
         font-weight: 600 !important;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
     }
     
-    /* ========= COLORFUL ALERTS ========= */
+    [data-testid="stMetricDelta"] {
+        font-size: 14px !important;
+    }
+    
+    /* ========= ALERTS ========= */
     .stSuccess {
-        background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%) !important;
-        color: white !important;
-        border: none !important;
-        border-radius: 14px !important;
-        padding: 16px 24px !important;
-        font-weight: 600 !important;
-        box-shadow: 0 8px 20px rgba(86, 171, 47, 0.3) !important;
+        background: #ecfdf5 !important;
+        border: 1px solid #86efac !important;
+        border-radius: 12px !important;
+        color: #166534 !important;
+        padding: 14px 18px !important;
+        font-weight: 500 !important;
     }
     
     .stError {
-        background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%) !important;
-        color: white !important;
-        border: none !important;
-        border-radius: 14px !important;
-        padding: 16px 24px !important;
-        font-weight: 600 !important;
-        box-shadow: 0 8px 20px rgba(235, 51, 73, 0.3) !important;
+        background: #fef2f2 !important;
+        border: 1px solid #fca5a5 !important;
+        border-radius: 12px !important;
+        color: #991b1b !important;
+        padding: 14px 18px !important;
+        font-weight: 500 !important;
     }
     
     .stInfo {
-        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
-        color: white !important;
-        border: none !important;
-        border-radius: 14px !important;
-        padding: 16px 24px !important;
-        font-weight: 600 !important;
-        box-shadow: 0 8px 20px rgba(79, 172, 254, 0.3) !important;
+        background: #eff6ff !important;
+        border: 1px solid #93c5fd !important;
+        border-radius: 12px !important;
+        color: #1e40af !important;
+        padding: 14px 18px !important;
+        font-weight: 500 !important;
+    }
+    
+    .stWarning {
+        background: #fffbeb !important;
+        border: 1px solid #fcd34d !important;
+        border-radius: 12px !important;
+        color: #92400e !important;
+        padding: 14px 18px !important;
+        font-weight: 500 !important;
     }
     
     /* ========= DATAFRAMES ========= */
     .stDataFrame {
-        background: #ffffff !important;
-        border: 1px solid #e8ecf4 !important;
-        border-radius: 16px !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 12px !important;
         overflow: hidden;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08) !important;
+        box-shadow: var(--shadow-sm) !important;
+    }
+    
+    .stDataFrame [data-testid="stDataFrameResizeHandle"] {
+        display: none;
     }
     
     /* ========= HEADERS ========= */
     h1 {
-        color: #2d3748 !important;
+        color: var(--text-dark) !important;
         font-weight: 800 !important;
-        font-size: 2.5rem !important;
-        letter-spacing: -0.5px;
+        font-size: 28px !important;
+        margin-bottom: 8px !important;
     }
     
     h2 {
-        color: #2d3748 !important;
+        color: var(--text-dark) !important;
         font-weight: 700 !important;
-        font-size: 1.8rem !important;
+        font-size: 22px !important;
+        margin-bottom: 6px !important;
     }
     
     h3 {
-        color: #4a5568 !important;
+        color: var(--text-dark) !important;
         font-weight: 600 !important;
-        font-size: 1.3rem !important;
+        font-size: 18px !important;
+        margin-bottom: 12px !important;
     }
     
-    /* ========= MODERN ENTRY CARDS ========= */
-    .modern-entry-card {
-        background: #ffffff;
-        border: 1px solid #e8ecf4;
+    /* ========= CARDS ========= */
+    .card {
+        background: var(--bg-white);
+        border: 1px solid var(--border);
         border-radius: 16px;
-        padding: 20px 24px;
-        margin-bottom: 14px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-        transition: all 0.25s ease;
-        position: relative;
-        overflow: hidden;
+        padding: 20px;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.2s ease;
     }
     
-    .modern-entry-card::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        width: 4px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-    
-    .modern-entry-card:hover {
+    .card:hover {
+        box-shadow: var(--shadow);
         transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-        border-color: #667eea;
     }
     
-    /* ========= STAT CARD CONTAINERS ========= */
+    /* ========= ENTRY CARD ========= */
+    .entry-card {
+        background: var(--bg-white);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 18px 20px;
+        margin-bottom: 12px;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.2s ease;
+        border-left: 3px solid var(--primary);
+    }
+    
+    .entry-card:hover {
+        box-shadow: var(--shadow);
+        border-left-color: var(--primary-dark);
+    }
+    
+    .entry-card.expense {
+        border-left-color: var(--danger);
+    }
+    
+    .entry-card.expense:hover {
+        border-left-color: #dc2626;
+    }
+    
+    /* ========= STAT CARD ========= */
     .stat-card {
-        background: #ffffff;
-        border: 1px solid #e8ecf4;
-        border-radius: 20px;
-        padding: 28px;
+        background: var(--bg-white);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: var(--shadow);
         text-align: center;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
         transition: all 0.3s ease;
     }
     
     .stat-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 45px rgba(0, 0, 0, 0.12);
+        box-shadow: var(--shadow-lg);
+        transform: translateY(-4px);
     }
     
-    .stat-icon {
-        font-size: 3rem;
+    .stat-card-icon {
+        font-size: 40px;
         margin-bottom: 12px;
     }
     
-    .stat-value {
-        font-size: 2.2rem;
+    .stat-card-value {
+        font-size: 36px;
         font-weight: 800;
         margin: 8px 0;
+        color: var(--text-dark);
     }
     
-    .stat-label {
-        color: #718096;
+    .stat-card-label {
+        color: var(--text-gray);
         font-size: 12px;
         text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 0.05em;
         font-weight: 600;
     }
     
+    /* ========= COLORS ========= */
+    .text-primary { color: var(--primary) !important; }
+    .text-success { color: var(--success) !important; }
+    .text-danger { color: var(--danger) !important; }
+    .text-warning { color: var(--warning) !important; }
+    .text-info { color: var(--info) !important; }
+    
+    .bg-primary { background: var(--primary) !important; }
+    .bg-success { background: var(--success) !important; }
+    .bg-danger { background: var(--danger) !important; }
+    .bg-warning { background: var(--warning) !important; }
+    .bg-info { background: var(--info) !important; }
+    
+    /* ========= UTILITIES ========= */
+    .rounded { border-radius: 12px; }
+    .shadow { box-shadow: var(--shadow); }
+    .shadow-lg { box-shadow: var(--shadow-lg); }
+    
     /* ========= SCROLLBAR ========= */
     ::-webkit-scrollbar {
-        width: 10px;
-        height: 10px;
+        width: 8px;
+        height: 8px;
     }
     
     ::-webkit-scrollbar-track {
-        background: #f7fafc;
+        background: var(--bg-light);
     }
     
     ::-webkit-scrollbar-thumb {
-        background: linear-gradient(135deg, #667eea, #764ba2);
-        border-radius: 5px;
+        background: #cbd5e1;
+        border-radius: 4px;
     }
     
     ::-webkit-scrollbar-thumb:hover {
-        background: linear-gradient(135deg, #764ba2, #667eea);
+        background: #94a3b8;
     }
     
-    /* ========= DIVIDERS ========= */
+    /* ========= DIVIDER ========= */
     hr {
         border: none;
         height: 1px;
-        background: linear-gradient(90deg, transparent, #e8ecf4, transparent);
-        margin: 28px 0;
+        background: var(--border);
+        margin: 24px 0;
     }
+    
+    /* ========= HIDE STREAMLIT BRANDING ========= */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
     </style>
     """, unsafe_allow_html=True)
 
-def page_header(title, subtitle="", emoji="📚"):
+def page_header(title, subtitle=""):
     st.markdown(f"""
     <div style="
-        background: #ffffff;
-        border: 1px solid #e8ecf4;
-        padding: 40px;
-        border-radius: 24px;
-        margin-bottom: 32px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-        text-align: center;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        padding: 32px 28px;
+        border-radius: 16px;
+        margin-bottom: 28px;
+        box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.3);
     ">
-        <div style="font-size: 4rem; margin-bottom: 16px;">{emoji}</div>
         <h1 style="
-            font-size: 2.5rem;
+            color: white;
+            font-size: 32px;
             font-weight: 800;
-            margin: 0;
-            color: #2d3748;
-            letter-spacing: -0.5px;
+            margin: 0 0 4px 0;
         ">{title}</h1>
         <p style="
-            font-size: 1rem;
-            color: #718096;
-            margin: 12px 0 0 0;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 15px;
+            margin: 0;
             font-weight: 500;
         ">{subtitle}</p>
     </div>
@@ -439,23 +532,9 @@ def get_dashboard(conn, year):
         ORDER BY month
     """, (year,)).fetchall()
     
-    top = conn.execute("""
-        SELECT 
-            e.code,
-            COALESCE(a.name,'') as name,
-            ROUND(SUM(e.income-e.payment),2) as balance
-        FROM entries e 
-        LEFT JOIN accounts a ON a.code=e.code
-        WHERE e.year=? 
-        GROUP BY e.code 
-        ORDER BY ABS(SUM(e.income-e.payment)) DESC 
-        LIMIT 10
-    """, (year,)).fetchall()
-    
     return {
         "summary": dict(summ),
-        "monthly": [dict(r) for r in monthly],
-        "top_accounts": [dict(r) for r in top]
+        "monthly": [dict(r) for r in monthly]
     }
 
 def fetch_entries(conn, year, mode=None, limit=None):
@@ -492,52 +571,35 @@ def save_entry(conn, year, date, code, description, amount, entry_type):
 
 # ----------------------- Login Page -----------------------
 def login_page():
-    apply_ultra_modern_css()
+    apply_perfect_design()
     
-    st.markdown("""
-    <div style="
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 85vh;
-    ">
-        <div style="
-            background: #ffffff;
-            padding: 60px 50px;
-            border-radius: 28px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-            max-width: 450px;
-            width: 100%;
-            text-align: center;
-            border: 1px solid #e8ecf4;
-        ">
-            <div style="font-size: 5rem; margin-bottom: 24px;">📚</div>
-            <h1 style="
-                font-size: 2.2rem;
-                font-weight: 800;
-                color: #2d3748;
-                margin-bottom: 8px;
-                letter-spacing: -0.5px;
-            ">مدرسہ اکاؤنٹنگ</h1>
-            <p style="
-                font-size: 0.95rem;
-                color: #718096;
-                margin-bottom: 40px;
-                font-weight: 500;
-            ">JAMIA MILLIA ISLAMIA & MASJID MADRASA WALI</p>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    col1, col2, col3 = st.columns([1, 1.5, 1])
     
-    col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
+        st.markdown("<br><br><br>", unsafe_allow_html=True)
+        st.markdown("""
+        <div style="
+            background: white;
+            padding: 48px 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+        ">
+            <div style="text-align: center; margin-bottom: 32px;">
+                <div style="font-size: 56px; margin-bottom: 16px;">📚</div>
+                <h1 style="font-size: 28px; font-weight: 800; color: #0f172a; margin: 0 0 8px 0;">مدرسہ اکاؤنٹنگ</h1>
+                <p style="color: #64748b; font-size: 14px; margin: 0;">Jamia Millia Islamia & Masjid Madrasa Wali</p>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
         with st.form("login_form"):
             username = st.text_input("👤 یوزر نیم", value="admin", placeholder="یوزر نیم درج کریں")
             password = st.text_input("🔒 پاس ورڈ", type="password", value="admin123", placeholder="پاس ورڈ درج کریں")
             
             st.markdown("<br>", unsafe_allow_html=True)
             
-            if st.form_submit_button("🔐 لاگ ان کریں", use_container_width=True):
+            if st.form_submit_button("لاگ ان کریں →", use_container_width=True):
                 conn = get_connection()
                 user = conn.execute("SELECT * FROM app_users WHERE username=?", (username,)).fetchone()
                 
@@ -561,30 +623,25 @@ def main_app():
         initial_sidebar_state="expanded"
     )
     
-    apply_ultra_modern_css()
+    apply_perfect_design()
     
     # Sidebar
     with st.sidebar:
         st.markdown("""
-        <div style="text-align: center; padding: 32px 0 28px 0;">
-            <div style="font-size: 3.5rem; margin-bottom: 16px;">📚</div>
-            <h2 style="font-size: 1.6rem; margin: 0; font-weight: 800; color: #2d3748;">مدرسہ اکاؤنٹس</h2>
-            <p style="color: #718096; margin: 8px 0 0 0; font-weight: 600; font-size: 0.9rem;">👤 {}</p>
+        <div style="text-align: center; padding: 24px 0; margin-bottom: 24px; border-bottom: 1px solid #e2e8f0;">
+            <div style="font-size: 48px; margin-bottom: 12px;">📚</div>
+            <h2 style="font-size: 20px; margin: 0; font-weight: 800; color: #0f172a;">مدرسہ اکاؤنٹس</h2>
+            <p style="color: #64748b; margin: 6px 0 0 0; font-size: 13px; font-weight: 600;">{}</p>
         </div>
         """.format(st.session_state.get('display_name', '')), unsafe_allow_html=True)
         
         years = get_years()
-        year = st.selectbox("📅 سال", years, index=0)
+        year = st.selectbox("📅 سال منتخب کریں", years, index=0)
         st.session_state.year = year
         
         st.markdown("<br>", unsafe_allow_html=True)
         
-        lang_options = ["🇬🇧 English", "🇵🇰 اردو"]
-        lang_idx = 0 if st.session_state.get("lang", "en") == "en" else 1
-        selected_lang = st.radio("🌐 زبان", lang_options, index=lang_idx)
-        st.session_state.lang = "en" if selected_lang.startswith("🇬🇧") else "ur"
-        
-        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("<p style='font-size: 11px; font-weight: 700; text-transform: uppercase; color: #64748b; margin-bottom: 12px;'>مینو</p>", unsafe_allow_html=True)
         
         if st.button("💰 انکم انٹری"):
             st.session_state.view = "income"
@@ -592,13 +649,13 @@ def main_app():
         if st.button("💸 خرچ انٹری"):
             st.session_state.view = "expense"
         
-        if st.button("📈 مالی جائزہ"):
+        if st.button("📊 ڈیش بورڈ"):
             st.session_state.view = "overview"
         
         if st.button("📒 لیجر"):
             st.session_state.view = "ledger"
         
-        if st.button("🗂 اکاؤنٹس"):
+        if st.button("🗂️ اکاؤنٹس"):
             st.session_state.view = "accounts"
         
         st.markdown("<br><br>", unsafe_allow_html=True)
@@ -612,33 +669,37 @@ def main_app():
     year = st.session_state.year
     
     if "view" not in st.session_state:
-        st.session_state.view = "income"
+        st.session_state.view = "overview"
     
     view = st.session_state.view
     
     # Income Entry
     if view == "income":
-        page_header("انکم انٹری", "روزانہ کی آمدنی درج کریں", "💰")
+        page_header("💰 انکم انٹری", "روزانہ کی آمدنی درج کریں")
         
         with st.form("income_form"):
             col1, col2 = st.columns(2)
             
-            date = col1.date_input("📆 تاریخ", value=datetime.now())
-            code = col2.text_input("🔢 اکاؤنٹ کوڈ", max_chars=3, placeholder="001")
+            with col1:
+                date = st.date_input("📆 تاریخ", value=datetime.now())
+                code = st.text_input("🔢 اکاؤنٹ کوڈ", max_chars=3, placeholder="001")
             
-            account_name = ""
-            if code:
-                acc = conn.execute("SELECT name FROM accounts WHERE code=?", (code.zfill(3),)).fetchone()
-                account_name = acc["name"] if acc else ""
+            with col2:
+                account_name = ""
+                if code:
+                    acc = conn.execute("SELECT name FROM accounts WHERE code=?", (code.zfill(3),)).fetchone()
+                    account_name = acc["name"] if acc else ""
+                
+                st.text_input("🏦 اکاؤنٹ کا نام", value=account_name, disabled=True)
+                amount = st.number_input("💵 رقم (PKR)", min_value=0.0, step=100.0, format="%.2f")
             
-            st.text_input("🏦 اکاؤنٹ کا نام", value=account_name, disabled=True)
-            
-            description = st.text_area("📄 تفصیل", placeholder="مکمل تفصیل یہاں لکھیں...", height=100)
-            amount = st.number_input("💵 رقم (PKR)", min_value=0.0, step=100.0, format="%.2f")
+            description = st.text_area("📝 تفصیل", placeholder="تفصیل یہاں لکھیں...", height=100)
             
             st.markdown("<br>", unsafe_allow_html=True)
             
-            submitted = st.form_submit_button("💾 محفوظ کریں", use_container_width=True)
+            col1, col2, col3 = st.columns([1, 1, 2])
+            with col2:
+                submitted = st.form_submit_button("✓ محفوظ کریں", use_container_width=True)
             
             if submitted:
                 if code and amount > 0:
@@ -650,56 +711,59 @@ def main_app():
                     except Exception as e:
                         st.error(f"❌ خرابی: {str(e)}")
                 else:
-                    st.error("⚠ کوڈ اور رقم ضروری ہیں")
+                    st.error("⚠️ کوڈ اور رقم ضروری ہیں")
         
-        st.markdown("<br><br>", unsafe_allow_html=True)
-        st.markdown("<h3 style='color: #2d3748; font-weight: 700;'>📋 حالیہ انکم انٹریز</h3>", unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("### 📋 حالیہ انٹریز")
         st.markdown("<br>", unsafe_allow_html=True)
         
         recent = fetch_entries(conn, year, mode="income", limit=10)
         if recent:
             for entry in recent:
                 st.markdown(f"""
-                <div class="modern-entry-card">
+                <div class="entry-card">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <div style="flex: 1;">
-                            <div style="font-size: 0.85rem; color: #718096; margin-bottom: 6px; font-weight: 600;">📅 {entry['entry_date']}</div>
-                            <div style="font-size: 1.05rem; font-weight: 700; color: #2d3748; margin-bottom: 6px;">🔢 {entry['code']} • {entry['account_name']}</div>
-                            <div style="font-size: 0.9rem; color: #4a5568;">📄 {entry['description'][:70]}</div>
+                            <div style="font-size: 12px; color: #64748b; margin-bottom: 4px; font-weight: 600;">📅 {entry['entry_date']}</div>
+                            <div style="font-size: 15px; font-weight: 700; color: #0f172a;">🔢 {entry['code']} • {entry['account_name']}</div>
+                            <div style="font-size: 13px; color: #475569; margin-top: 4px;">📝 {entry['description'][:80]}</div>
                         </div>
                         <div style="text-align: right; min-width: 140px;">
-                            <div style="font-size: 1.8rem; font-weight: 800; color: #667eea;">₨ {entry['income']:,.0f}</div>
-                            <div style="font-size: 0.85rem; color: #718096; font-weight: 600;">PKR</div>
+                            <div style="font-size: 24px; font-weight: 800; color: #6366f1;">₨ {entry['income']:,.0f}</div>
                         </div>
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
         else:
-            st.info("ℹ ابھی تک کوئی انکم درج نہیں ہوئی")
+            st.info("ℹ️ ابھی تک کوئی انکم درج نہیں ہوئی")
     
     # Expense Entry
     elif view == "expense":
-        page_header("خرچ انٹری", "روزانہ کے اخراجات درج کریں", "💸")
+        page_header("💸 خرچ انٹری", "روزانہ کے اخراجات درج کریں")
         
         with st.form("expense_form"):
             col1, col2 = st.columns(2)
             
-            date = col1.date_input("📆 تاریخ", value=datetime.now())
-            code = col2.text_input("🔢 اکاؤنٹ کوڈ", max_chars=3, placeholder="007")
+            with col1:
+                date = st.date_input("📆 تاریخ", value=datetime.now())
+                code = st.text_input("🔢 اکاؤنٹ کوڈ", max_chars=3, placeholder="007")
             
-            account_name = ""
-            if code:
-                acc = conn.execute("SELECT name FROM accounts WHERE code=?", (code.zfill(3),)).fetchone()
-                account_name = acc["name"] if acc else ""
+            with col2:
+                account_name = ""
+                if code:
+                    acc = conn.execute("SELECT name FROM accounts WHERE code=?", (code.zfill(3),)).fetchone()
+                    account_name = acc["name"] if acc else ""
+                
+                st.text_input("🏦 اکاؤنٹ کا نام", value=account_name, disabled=True)
+                amount = st.number_input("💵 رقم (PKR)", min_value=0.0, step=100.0, format="%.2f")
             
-            st.text_input("🏦 اکاؤنٹ کا نام", value=account_name, disabled=True)
-            
-            description = st.text_area("📄 تفصیل", placeholder="مکمل تفصیل یہاں لکھیں...", height=100)
-            amount = st.number_input("💵 رقم (PKR)", min_value=0.0, step=100.0, format="%.2f")
+            description = st.text_area("📝 تفصیل", placeholder="تفصیل یہاں لکھیں...", height=100)
             
             st.markdown("<br>", unsafe_allow_html=True)
             
-            submitted = st.form_submit_button("💾 محفوظ کریں", use_container_width=True)
+            col1, col2, col3 = st.columns([1, 1, 2])
+            with col2:
+                submitted = st.form_submit_button("✓ محفوظ کریں", use_container_width=True)
             
             if submitted:
                 if code and amount > 0:
@@ -711,36 +775,35 @@ def main_app():
                     except Exception as e:
                         st.error(f"❌ خرابی: {str(e)}")
                 else:
-                    st.error("⚠ کوڈ اور رقم ضروری ہیں")
+                    st.error("⚠️ کوڈ اور رقم ضروری ہیں")
         
-        st.markdown("<br><br>", unsafe_allow_html=True)
-        st.markdown("<h3 style='color: #2d3748; font-weight: 700;'>📋 حالیہ خرچ انٹریز</h3>", unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("### 📋 حالیہ انٹریز")
         st.markdown("<br>", unsafe_allow_html=True)
         
         recent = fetch_entries(conn, year, mode="expense", limit=10)
         if recent:
             for entry in recent:
                 st.markdown(f"""
-                <div class="modern-entry-card">
+                <div class="entry-card expense">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <div style="flex: 1;">
-                            <div style="font-size: 0.85rem; color: #718096; margin-bottom: 6px; font-weight: 600;">📅 {entry['entry_date']}</div>
-                            <div style="font-size: 1.05rem; font-weight: 700; color: #2d3748; margin-bottom: 6px;">🔢 {entry['code']} • {entry['account_name']}</div>
-                            <div style="font-size: 0.9rem; color: #4a5568;">📄 {entry['description'][:70]}</div>
+                            <div style="font-size: 12px; color: #64748b; margin-bottom: 4px; font-weight: 600;">📅 {entry['entry_date']}</div>
+                            <div style="font-size: 15px; font-weight: 700; color: #0f172a;">🔢 {entry['code']} • {entry['account_name']}</div>
+                            <div style="font-size: 13px; color: #475569; margin-top: 4px;">📝 {entry['description'][:80]}</div>
                         </div>
                         <div style="text-align: right; min-width: 140px;">
-                            <div style="font-size: 1.8rem; font-weight: 800; color: #eb3349;">₨ {entry['payment']:,.0f}</div>
-                            <div style="font-size: 0.85rem; color: #718096; font-weight: 600;">PKR</div>
+                            <div style="font-size: 24px; font-weight: 800; color: #ef4444;">₨ {entry['payment']:,.0f}</div>
                         </div>
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
         else:
-            st.info("ℹ ابھی تک کوئی خرچ درج نہیں ہوا")
+            st.info("ℹ️ ابھی تک کوئی خرچ درج نہیں ہوا")
     
     # Overview
     elif view == "overview":
-        page_header("مالی جائزہ", f"سال {year} کا مکمل خلاصہ", "📈")
+        page_header("📊 ڈیش بورڈ", f"سال {year} کا مالی جائزہ")
         
         dash = get_dashboard(conn, year)
         
@@ -749,52 +812,68 @@ def main_app():
         with col1:
             st.markdown(f"""
             <div class="stat-card">
-                <div class="stat-icon">💰</div>
-                <div class="stat-label">کل آمدنی</div>
-                <div class="stat-value" style="color: #667eea;">₨ {dash['summary']['total_income']:,.0f}</div>
-                <div style="font-size: 0.9rem; color: #718096; margin-top: 4px;">PKR</div>
+                <div class="stat-card-icon">💰</div>
+                <div class="stat-card-label">کل آمدنی</div>
+                <div class="stat-card-value text-primary">₨ {dash['summary']['total_income']:,.0f}</div>
             </div>
             """, unsafe_allow_html=True)
         
         with col2:
             st.markdown(f"""
             <div class="stat-card">
-                <div class="stat-icon">💸</div>
-                <div class="stat-label">کل اخراجات</div>
-                <div class="stat-value" style="color: #eb3349;">₨ {dash['summary']['total_payment']:,.0f}</div>
-                <div style="font-size: 0.9rem; color: #718096; margin-top: 4px;">PKR</div>
+                <div class="stat-card-icon">💸</div>
+                <div class="stat-card-label">کل اخراجات</div>
+                <div class="stat-card-value text-danger">₨ {dash['summary']['total_payment']:,.0f}</div>
             </div>
             """, unsafe_allow_html=True)
         
         with col3:
             balance = dash['summary']['balance']
-            balance_color = "#56ab2f" if balance > 0 else "#eb3349"
+            balance_color = "text-success" if balance > 0 else "text-danger"
             st.markdown(f"""
             <div class="stat-card">
-                <div class="stat-icon">⚖️</div>
-                <div class="stat-label">خالص بیلنس</div>
-                <div class="stat-value" style="color: {balance_color};">₨ {balance:,.0f}</div>
-                <div style="font-size: 0.9rem; color: #718096; margin-top: 4px;">PKR</div>
+                <div class="stat-card-icon">⚖️</div>
+                <div class="stat-card-label">خالص بیلنس</div>
+                <div class="stat-card-value {balance_color}">₨ {balance:,.0f}</div>
             </div>
             """, unsafe_allow_html=True)
         
         if dash['monthly']:
             st.markdown("<br><br>", unsafe_allow_html=True)
-            st.markdown("<h3 style='color: #2d3748; font-weight: 700;'>📊 ماہانہ رپورٹ</h3>", unsafe_allow_html=True)
-            st.markdown("<br>", unsafe_allow_html=True)
+            st.markdown("### 📈 ماہانہ رپورٹ")
+            
             df = pd.DataFrame(dash['monthly'])
-            st.bar_chart(df.set_index('month')[['income', 'payment']])
-        
-        if dash['top_accounts']:
-            st.markdown("<br><br>", unsafe_allow_html=True)
-            st.markdown("<h3 style='color: #2d3748; font-weight: 700;'>🏆 اہم اکاؤنٹس</h3>", unsafe_allow_html=True)
-            st.markdown("<br>", unsafe_allow_html=True)
-            df = pd.DataFrame(dash['top_accounts'])
-            st.dataframe(df, use_container_width=True, height=400)
+            
+            fig = go.Figure()
+            fig.add_trace(go.Bar(
+                x=df['month'],
+                y=df['income'],
+                name='آمدنی',
+                marker_color='#6366f1'
+            ))
+            fig.add_trace(go.Bar(
+                x=df['month'],
+                y=df['payment'],
+                name='اخراجات',
+                marker_color='#ef4444'
+            ))
+            
+            fig.update_layout(
+                barmode='group',
+                height=400,
+                margin=dict(l=0, r=0, t=0, b=0),
+                plot_bgcolor='white',
+                paper_bgcolor='white',
+                font=dict(family='Inter', size=12),
+                xaxis=dict(showgrid=False),
+                yaxis=dict(showgrid=True, gridcolor='#f1f5f9')
+            )
+            
+            st.plotly_chart(fig, use_container_width=True)
     
     # Ledger
     elif view == "ledger":
-        page_header("لیجر", "تمام لین دین دیکھیں", "📒")
+        page_header("📒 لیجر", "تمام لین دین")
         
         entries = fetch_entries(conn, year, limit=100)
         
@@ -805,7 +884,7 @@ def main_app():
                     "📅 تاریخ": e['entry_date'],
                     "🔢 کوڈ": e['code'],
                     "🏦 اکاؤنٹ": e['account_name'],
-                    "📄 تفصیل": e['description'][:60],
+                    "📝 تفصیل": e['description'][:60],
                     "💰 آمدنی": f"₨ {e['income']:,.0f}" if e['income'] > 0 else "-",
                     "💸 اخراجات": f"₨ {e['payment']:,.0f}" if e['payment'] > 0 else "-"
                 })
@@ -813,17 +892,13 @@ def main_app():
             df = pd.DataFrame(data)
             st.dataframe(df, use_container_width=True, height=600)
         else:
-            st.info("ℹ کوئی ڈیٹا نہیں ملا")
+            st.info("ℹ️ کوئی ڈیٹا نہیں ملا")
     
     # Accounts
     elif view == "accounts":
-        page_header("اکاؤنٹس کی فہرست", "تمام اکاؤنٹ ہیڈز", "🗂")
+        page_header("🗂️ اکاؤنٹس", "تمام اکاؤنٹ ہیڈز")
         
-        accounts = conn.execute("""
-            SELECT code, name, atype
-            FROM accounts
-            ORDER BY code
-        """).fetchall()
+        accounts = conn.execute("SELECT code, name, atype FROM accounts ORDER BY code").fetchall()
         
         if accounts:
             data = []
@@ -837,7 +912,7 @@ def main_app():
             df = pd.DataFrame(data)
             st.dataframe(df, use_container_width=True, height=600)
         else:
-            st.info("ℹ کوئی اکاؤنٹ نہیں ملا")
+            st.info("ℹ️ کوئی اکاؤنٹ نہیں ملا")
     
     conn.close()
 
