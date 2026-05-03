@@ -3,3 +3,4 @@ bcrypt
 pandas
 pytesseract
 pillow
+plotly
